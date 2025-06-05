@@ -194,7 +194,7 @@ if ($_SESSION['userid'] == "") {
                                     <td style='vertical-align: top; width:7%; white-space: nowrap;'>
                                         <a href='EditCustomer.php?CustomerID={$row['CustomerID']}' style='width:60px;' title='Kunde bearbeiten' class='btn btn-primary btn-sm'><i class='fa-solid fa-pen-to-square'></i></a>
                                         <a href='AddTicket.php?CustomerID={$row['CustomerID']}' style='width:60px;' title='Ticket hinzufügen' class='btn btn-primary btn-sm'><i class='fa-solid fa-ticket'></i></a>
-                                        <a href='DeleteCustomer.php?CustomerID={$row['CustomerID']}' style='width:60px;' title='Kunde löschen' class='btn btn-danger btn-sm delete-button'><i class='fa-solid fa-trash'></i></a>
+                                        <a href='DeleteCustomer.php?CustomerID={$row['CustomerID']}' data-id={$row['CustomerID']} style='width:60px;' title='Kunde löschen' class='btn btn-danger btn-sm delete-button'><i class='fa-solid fa-trash'></i></a>
                                     </td>
                                     
                                 </tr>";
@@ -240,12 +240,13 @@ if ($_SESSION['userid'] == "") {
         </form>
 
         <script>
-            $(document).ready(function () {
+             $(document).ready(function () {
                 let deleteId = null; // Speichert die ID für die Löschung
 
                 $('.delete-button').on('click', function (event) {
                     event.preventDefault();
                     deleteId = $(this).data('id'); // Hole die ID aus dem Button-Datenattribut
+                    //alert(deleteId);
                     $('#confirmDeleteModal').modal('show'); // Zeige das Modal an
                 });
 

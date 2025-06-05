@@ -190,7 +190,7 @@ if ($_SESSION['userid'] == "") {
                                     <td>{$row['Description']}</td>
                                     <td style='vertical-align: top; width:7%; white-space: nowrap;'>
                                         <a href='EditPriority.php?PriorityID={$row['PriorityID']}' style='width:60px;' title='Priorität bearbeiten' class='btn btn-primary btn-sm'><i class='fa-solid fa-pen-to-square'></i></a>
-                                        <a href='DeletePriority.php?PriorityID={$row['PriorityID']}' style='width:60px;' data-PriorityID='{$row['PriorityID']} title='Priorität löschen' class='btn btn-danger btn-sm delete-button'><i class='fa-solid fa-trash'></i></a>
+                                        <a href='DeletePriority.php?PriorityID={$row['PriorityID']}' style='width:60px;' data-id={$row['PriorityID']} title='Priorität löschen' class='btn btn-danger btn-sm delete-button'><i class='fa-solid fa-trash'></i></a>
                                     </td>
                                     
                                 </tr>";
@@ -242,23 +242,25 @@ if ($_SESSION['userid'] == "") {
 
                 $('.delete-button').on('click', function (event) {
                     event.preventDefault();
-                    deleteId = $(this).data[0]; // Hole die ID aus dem Button-Datenattribut
-
-
-                    alert(deleteId);
+                    deleteId = $(this).data('id'); // Hole die ID aus dem Button-Datenattribut
+                    //alert(deleteId);
                     $('#confirmDeleteModal').modal('show'); // Zeige das Modal an
                 });
 
                 $('#confirmDeleteBtn').on('click', function () {
                     if (deleteId) {
-                        $('<form>', {
+                        // Dynamisches Formular erstellen und absenden
+                        const form = $('<form>', {
                             action: 'DeletePriority.php',
                             method: 'POST'
                         }).append($('<input>', {
                             type: 'hidden',
-                            name: 'PriorityID',
+                            name: 'id',
                             value: deleteId
-                        })).appendTo('body').submit();
+                        }));
+
+                        $('body').append(form);
+                        form.submit();
                     }
                     $('#confirmDeleteModal').modal('hide'); // Schließe das Modal
 

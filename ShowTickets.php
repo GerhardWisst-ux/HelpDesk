@@ -109,6 +109,8 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
   $userid = $_SESSION['userid'];
 
   $TicketID = $_GET['TicketID'];
+  $_SESSION['TicketID']  = $_GET['TicketID'];
+  
   ?>
 
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -168,7 +170,7 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
       echo '</div>';
 
       echo '<div class="btn-group me-2" role="group" aria-label="First group">';
-      echo '<a href=CreateInvoice.php?TicketID='. $TicketID .' title="Rechnung erzeugen" class="btn btn-primary btn-sm"><span><i class="fa-solid fa-file-pdf"></i></span></a>';
+      echo '<a href=CreateInvoice.php?TicketID=' . $TicketID . ' title="Rechnung erzeugen" class="btn btn-primary btn-sm"><span><i class="fa-solid fa-file-pdf"></i></span></a>';
       echo '</div>';
       echo '</div>';
       echo '</div><br>';
@@ -261,6 +263,7 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
       while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         // Datum ins deutsche Format umwandeln
       
+        //$_SESSION("TicketID") = $row['TicketID'];
         $formattedDateCreate = (new DateTime($row['CreatedDate']))->format('Y-m-d');
         $formattedDateDue = (new DateTime($row['DueDate']))->format('Y-m-d');
         $formattedDateClosed = (new DateTime($row['ClosedDate']))->format('Y-m-d');
@@ -367,6 +370,8 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
         </div>
     </div>
 
+    <a href='AddTicketDetail.php' title='Eintrag hinzufügen' class='btn btn-primary btn-sm me-4'><span><i class='fa fa-plus' aria-hidden='true'></i></span></a><br>'
+
 '
     <div class='custom-container'>
     <table id='TableTicketDetail' class='display nowrap'>
@@ -395,7 +400,7 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
                     <td style='vertical-align: top; width:7%; white-space: nowrap;' class='betrag-right'>" . number_format($row['BillingHours'], 2, '.', ',') . "</td>
                     <td style='vertical-align: top; width:3%; white-space: nowrap;'>
                         <a href='EditTicketDetail.php?id={$row['TicketDetailID']}' style='width:60px;' title='Ticket Detail bearbeiten' class='btn btn-primary btn-sm'><i class='fa-solid fa-pen-to-square'></i></a>
-                        <a href='DeleteTicketDetail.php?id={$row['TicketDetailID']}' style='width:60px;' data-TicketDetailID='{$row['TicketDetailID']} title='Ticket Detail löschen' class='btn btn-danger btn-sm delete-button'><i class='fa-solid fa-trash'></i></a>
+                        <a href='DeleteTicketDetail.php?id={$row['TicketDetailID']}' style='width:60px;' data-id={$row['TicketDetailID']} title='Ticket Detail löschen' class='btn btn-danger btn-sm delete-button'><i class='fa-solid fa-trash'></i></a>
                     </td>
                 </tr>";
         }
@@ -510,7 +515,8 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
 
       $('.delete-button').on('click', function (event) {
         event.preventDefault();
-        deleteId = $(this).data('TicketDetailID'); // Hole die ID aus dem Button-Datenattribut
+        deleteId = $(this).data('id'); // Hole die ID aus dem Button-Datenattribut
+        //alert(deleteId);
         $('#confirmDeleteModal').modal('show'); // Zeige das Modal an
       });
 
@@ -518,7 +524,7 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
         if (deleteId) {
           // Dynamisches Formular erstellen und absenden
           const form = $('<form>', {
-            action: 'DeleteTicket.php',
+            action: 'DeleteTicketDetail.php',
             method: 'POST'
           }).append($('<input>', {
             type: 'hidden',

@@ -12,7 +12,7 @@ if ($_SESSION['userid'] == "") {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>HelpDesk Ticket hinzufügen</title>
+    <title>HelpDesk TicketDetail hinzufügen</title>
 
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -169,11 +169,11 @@ if ($_SESSION['userid'] == "") {
     </nav>
 
     <div id="addTicket">
-        <form action="AddTicketEntry.php" method="post">
+        <form action="AddTicketDetailEntry.php" method="post">
             <div class="custom-container">
                 <div class="mt-0 p-5 bg-secondary text-white text-center rounded-bottom">
                     <h1>HelpDesk</h1>
-                    <p>Tickets - Ticket hinzufügen</p>
+                    <p>Tickets - Ticketdetail hinzufügen</p>
                 </div>
 
                 <div class="container-fluid mt-3">
@@ -190,23 +190,18 @@ if ($_SESSION['userid'] == "") {
             </div>
             <br>
             <div class="form-group row me-4">
-                <label class="col-sm-2 col-form-label text-dark">Datum:</label>
-                <div class="col-sm-1">
-                    <input class="form-control" type="date" id="createddate" name="createddate" required>
-                    <small id="createddateError" class="text-danger"></small>
-                </div>
-            </div>
-            <div class="form-group row me-4">
-                <label class="col-sm-2 col-form-label text-dark">Zu erledigen bis:</label>
-                <div class="col-sm-1">
-                    <input class="form-control" type="date" id="DueDate" name="duedate" required>
-                    <small id="duedateError" class="text-danger"></small>
+                <label class="col-sm-2 col-form-label text-dark">Ticket-ID:</label>
+                <div class="col-sm-10">
+                    <input id="ticketid" maxlength="150" class="form-control" type="text"
+                        value="<?= $_SESSION['TicketID'] ?>" disabled>
+                    <input type="hidden" name="ticketid" value="<?= $_SESSION['TicketID'] ?>">
                 </div>
             </div>
             <div class="form-group row me-4">
                 <label class="col-sm-2 col-form-label text-dark">Beschreibung:</label>
                 <div class="col-sm-10">
-                    <input class="form-control" maxlength="150" type="text" id="description" name="description" required>
+                    <input class="form-control" maxlength="150" type="text" id="description" name="description"
+                        required>
                     <small id="descriptionError" class="text-danger"></small>
                 </div>
             </div>
@@ -218,73 +213,18 @@ if ($_SESSION['userid'] == "") {
                 </div>
             </div>
             <div class="form-group row me-4">
-                <label id="labelcustomer" class="col-sm-2 col-form-label text-dark">Kunde:</label>
-                <div class="col-sm-2">
-                    <select class="form-control" id="customerid" onchange="toggleCustomInput(this)" name="customerid">
-                        <?php
-                        $sql = "SELECT * FROM customer";
-                        $stmt = $pdo->prepare(query: $sql);
-                        $stmt->execute();
-
-                        // echo "<option value='' disabled selected>Wert eingeben</option>";
-                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                            echo "<option value='" . htmlspecialchars($row['CustomerID']) . "'>" . htmlspecialchars($row['Firma']) . "</option>";
-                        }
-                        ?>
-                        <option value="custom">Wert eingeben</option>
-                    </select>
-
-                    <input class="form-control mt-2 d-none" type="text" id="custom-input" name="custom_status"
-                        placeholder="Wert eingeben">
-                </div>
-            </div>
-            <div class="form-group row me-4">
-                <label id="labelstatus" class="col-sm-2 col-form-label text-dark">Status:</label>
-                <div class="col-sm-2">
-                    <select class="form-control" id=statusid" onchange="toggleCustomInput(this)" name="statusid">
-                        <?php
-                        $sql = "SELECT * FROM status";
-                        $stmt = $pdo->prepare(query: $sql);
-                        $stmt->execute();
-
-                        // echo "<option value='' disabled selected>Wert eingeben</option>";
-                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                            echo "<option value='" . htmlspecialchars($row['StatusID']) . "'>" . htmlspecialchars($row['Description']) . "</option>";
-                        }
-                        ?>
-                        <option value="custom">Wert eingeben</option>
-                    </select>
-
-                    <input class="form-control mt-2 d-none" type="text" id="custom-input" name="custom_status"
-                        placeholder="Wert eingeben">
+                <label class="col-sm-2 col-form-label text-dark">Berechnete Stunden:</label>
+                <div class="col-sm-10">
+                    <input id="billingHours" class="form-control" type="number" name="billingHours">
+                    <small id="billingHoursError" class="text-danger"></small>
                 </div>
             </div>
 
-            <div class="form-group row me-4">
-                <label id="labelpriority" class="col-sm-2 col-form-label text-dark">Priorität:</label>
-                <div class="col-sm-2">
-                    <select class="form-control" id="priorityid" onchange="toggleCustomInput(this)" name="priorityid">
-                        <?php
-                        $sql = "SELECT * FROM priority";
-                        $stmt = $pdo->prepare(query: $sql);
-                        $stmt->execute();
 
-                        // echo "<option value='' disabled selected>Wert eingeben</option>";
-                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                            echo "<option value='" . htmlspecialchars($row['PriorityID']) . "'>" . htmlspecialchars($row['Description']) . "</option>";
-                        }
-                        ?>
-                        <option value="custom">Wert eingeben</option>
-                    </select>
-
-                    <input class="form-control mt-2 d-none" type="text" id="custom-input" name="custom_status"
-                        placeholder="Wert eingeben">
-                </div>
-            </div>
             <div class="form-group row me-4">
                 <div class="col-sm-offset-2 col-sm-10">
                     <button class="btn btn-primary" type="submit"><i class="fas fa-save"></i></button>
-                    <a href="TicketUebersicht.php" title="Zurück zur Hauptübersicht" class="btn btn-primary"><i
+                    <a href="ShowTickets.php" title="Zurück zur Hauptübersicht" class="btn btn-primary"><i
                             class="fa fa-arrow-left" aria-hidden="true"></i></a>
                 </div>
             </div>
@@ -345,11 +285,11 @@ if ($_SESSION['userid'] == "") {
             // Regeln
             const minLength = 3;
             const maxLength = 100;
-            
+
             const descriptionInput = document.getElementById('description');
             const descriptionError = document.getElementById('descriptionError');
             const valueDescription = descriptionInput.value.trim();
-            
+
 
             let errorMessage = '';
 
@@ -378,7 +318,7 @@ if ($_SESSION['userid'] == "") {
                 notesErrorMessage = `Die Bemerkung muss mindestens ${minLength} Zeichen lang sein.`;
             } else if (valuenotes.length > maxLength) {
                 notesErrorMessage = `Die Bemerkung darf maximal ${maxLength} Zeichen lang sein.`;
-            } 
+            }
 
             if (notesErrorMessage) {
                 e.preventDefault(); // Verhindert das Absenden des Formulars
@@ -394,18 +334,15 @@ if ($_SESSION['userid'] == "") {
             let createddateErrorMessage = '';
 
             // Validierung für Bemerkung
-            if (!isValidDate(valuecreateddate))
-            {
+            if (!isValidDate(valuecreateddate)) {
                 createddateErrorMessage = `Datum ist ungültig.`;
             }
 
-            if (createddateErrorMessage) 
-            {
+            if (createddateErrorMessage) {
                 e.preventDefault(); // Verhindert das Absenden des Formulars
                 createddateError.textContent = createddateErrorMessage;
             }
-            else 
-            {
+            else {
                 createddateError.textContent = ''; // Fehlernachricht zurücksetzen
             }
 
@@ -416,23 +353,19 @@ if ($_SESSION['userid'] == "") {
             let duedateErrorMessage = '';
 
             // Validierung für Bemerkung
-            if (!isValidDate(valueduedate)) 
-            {
+            if (!isValidDate(valueduedate)) {
                 duedateErrorMessage = `Datum Zu Erledigen bis ist ungültig.`;
             }
 
-            if (duedateErrorMessage) 
-            {
+            if (duedateErrorMessage) {
                 e.preventDefault(); // Verhindert das Absenden des Formulars
                 duedateError.textContent = duedateErrorMessage;
-            } else 
-            {
+            } else {
                 duedateError.textContent = ''; // Fehlernachricht zurücksetzen
             }
         });
 
-        function isValidDate(dateString) 
-        {
+        function isValidDate(dateString) {
             // Versuchen, ein Datum aus dem String zu erstellen
             const date = new Date(dateString);
 

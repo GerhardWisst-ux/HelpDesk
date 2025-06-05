@@ -12,7 +12,7 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HelpDesk Ticket bearbeiten</title>
+  <title>HelpDesk Kunde bearbeiten</title>
 
   <link href="css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -83,11 +83,11 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
 
   // Abfrage der E-Mail vom Login
   $email = $_SESSION['email'];
-  if (isset($_GET['TicketID'])) {
-    $id = $_GET['TicketID'];
-    $_SESSION['TicketID'] = $_GET['TicketID'];
+  if (isset($_GET['id'])) {
+    $id = $_GET['id'];
+    $_SESSION['TicketDetailID'] = $_GET['id'];
     $email = $_SESSION['email'];
-    $sql = "Select * FROM ticket WHERE TicketID = :id";
+    $sql = "Select * FROM ticketdetail WHERE TicketDetailID = :id";
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['id' => $id]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -126,11 +126,11 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
   </nav>
 
   <div id="editticket">
-    <form action="EditTicketEntry.php" method="post">
+    <form action="EditTicketDetailEntry.php" method="post">
       <div class="custom-container">
         <div class="mt-0 p-5 bg-secondary text-white text-center rounded-bottom">
           <h1>HelpDesk</h1>
-          <p>Ticket bearbeiten</p>
+          <p>TicketDetail bearbeiten</p>
         </div>
         <br>
         <div class="form-group row me-4">
@@ -146,30 +146,31 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
           <div class="form-group row">
             <label class="col-sm-2 col-form-label text-dark">TicketID:</label>
             <div class="col-sm-3">
-              <input id="ticketid" class="form-control" type="text" name="ticketid"
-                value="<?= htmlspecialchars($result['TicketID']) ?>">
+              <input id="ticketid" maxlength="150" class="form-control" type="text" value="<?= $_SESSION['TicketID'] ?>"
+                disabled>
+              <input type="hidden" name="ticketid" value="<?= $_SESSION['TicketID'] ?>">
             </div>
           </div>
           <div class="form-group row">
-            <label class="col-sm-2 col-form-label text-dark">Datum:</label>
-            <div class="col-sm-3">
-              <input id="createddate" class="form-control" type="date" name="createddate"
-                value="<?= htmlspecialchars($result['CreatedDate']) ?>">
-              <small id="createddateError" class="text-danger"></small>
+            <label class="col-sm-2 col-form-label text-dark">TicketDetailID:</label>
+             <div class="col-sm-3">
+              <input id="ticketdetailid" maxlength="150" class="form-control" type="text" value="<?= $_SESSION['TicketDetailID'] ?>"
+                disabled>
+              <input type="hidden" name="ticketdetailid" value="<?= $_SESSION['TicketDetailID'] ?>">
             </div>
           </div>
           <div class="form-group row">
-            <label class="col-sm-2 col-form-label text-dark">Zu erledigen bis:</label>
+            <label class="col-sm-2 col-form-label text-dark">Service-Datum:</label>
             <div class="col-sm-3">
-              <input id="duedate" class="form-control" type="date" name="duedate"
-                value="<?= htmlspecialchars($result['DueDate']) ?>">
-              <small id="duedateError" class="text-danger"></small>
+              <input id="servicedatetime" maxlength="150" class="form-control" type="text" name="servicedatetime"
+                value="<?= htmlspecialchars($result['ServiceDateTime']) ?>">
+              <small id="servicedatetimeError" class="text-danger"></small>
             </div>
           </div>
           <div class="form-group row">
             <label class="col-sm-2 col-form-label text-dark">Beschreibung:</label>
             <div class="col-sm-10">
-              <input id="description" class="form-control"  maxlength="150"  type="text" name="description"
+              <input id="description" maxlength="5000" class="form-control" type="text" name="description"
                 value="<?= htmlspecialchars($result['Description']) ?>">
               <small id="descriptionError" class="text-danger"></small>
             </div>
@@ -177,76 +178,28 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
           <div class="form-group row">
             <label class="col-sm-2 col-form-label text-dark">Bemerkung:</label>
             <div class="col-sm-10">
-              <input id="notes" class="form-control"  maxlength="5000"  type="text" name="notes"
+              <input id="notes" class="form-control" type="text" name="notes"
                 value="<?= htmlspecialchars($result['Notes']) ?>">
               <small id="notesError" class="text-danger"></small>
             </div>
           </div>
           <div class="form-group row">
-            <label class="col-sm-2 col-form-label text-dark">Kunde:</label>
-            <div class="col-sm-3">
-              <select id="customerid" class="form-control" name="customerid">
-                <?php
-                // SQL-Abfrage, um Kundendaten zu holen
-                $sql = "SELECT CustomerID, Firma FROM customer";
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute();
-
-                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                  // Markieren der aktuellen Auswahl
-                  $selected = ($result['CustomerID'] == $row['CustomerID']) ? "selected" : "";
-                  echo $selected;
-                  echo "<option value='" . htmlspecialchars($row['CustomerID']) . "' $selected>" . htmlspecialchars($row['Firma']) . "</option>";
-                }
-                ?>
-              </select>
-            </div>
-          </div>
-          <div class="form-group row">
-            <label class="col-sm-2 col-form-label text-dark">Status:</label>
-            <div class="col-sm-3">
-              <select id="statusid" class="form-control" name="statusid">
-                <?php
-                // SQL-Abfrage, um Kundendaten zu holen
-                $sql = "SELECT StatusID, Description FROM status";
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute();
-
-                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                  // Markieren der aktuellen Auswahl
-                  $selected = ($result['StatusID'] == $row['StatusID']) ? "selected" : "";
-                  echo "<option value='" . htmlspecialchars($row['StatusID']) . "' $selected>" . htmlspecialchars($row['Description']) . "</option>";
-                }
-                ?>
-              </select>
-            </div>
-          </div>
-          <div class="form-group row">
-            <label class="col-sm-2 col-form-label text-dark">Priorität:</label>
-            <div class="col-sm-3">
-              <select id="priorityid" class="form-control" name="priorityid">
-                <?php
-                // SQL-Abfrage, um Kundendaten zu holen
-                $sql = "SELECT PriorityID, Description FROM priority";
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute();
-
-                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                  // Markieren der aktuellen Auswahl
-                  $selected = ($result['PriorityID'] == $row['PriorityID']) ? "selected" : "";
-                  echo "<option value='" . htmlspecialchars($row['PriorityID']) . "' $selected>" . htmlspecialchars($row['Description']) . "</option>";
-                }
-                ?>
-              </select>
+            <label class="col-sm-2 col-form-label text-dark">Berechnete Stunden:</label>
+            <div class="col-sm-10">
+              <input id="billingHours" class="form-control" type="number" name="billingHours"
+                value="<?= htmlspecialchars($result['BillingHours']) ?>">
+              <small id="billingHoursError" class="text-danger"></small>
             </div>
           </div>
         </div>
         <div class="form-group row me-4">
           <div class="col-sm-offset-2 col-sm-10">
-            <button class="btn btn-primary" title="Speichert Ticket ab" type="submit"><i
+            <button class="btn btn-primary" title="Speichert TicketDetail ab" type="submit"><i
                 class="fas fa-save"></i></button>
-            <a href="TicketUebersicht.php" title="Zurück zur Übersicht Tickets" class="btn btn-primary"><span>
-                <i class="fa fa-arrow-left" aria-hidden="true"></i></span></a>'
+            <a href="ShowTickets.php?TicketID=<?= $_SESSION['TicketID'] ?>" title="Zurück zur Übersicht Tickets"
+              class="btn btn-primary">
+              <span>Zurück zur Übersicht Tickets</span>
+            </a>
           </div>
         </div>
     </form>
@@ -305,7 +258,7 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
       // Regeln
       const minLength = 3;
       const maxLength = 100;
-      
+
       const descriptionInput = document.getElementById('description');
       const descriptionError = document.getElementById('descriptionError');
       const valueDescription = descriptionInput.value.trim();
@@ -318,7 +271,7 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
         errorMessage = `Die Beschreibung muss mindestens ${minLength} Zeichen lang sein.`;
       } else if (valueDescription.length > maxLength) {
         errorMessage = `Die Beschreibung darf maximal ${maxLength} Zeichen lang sein.`;
-      } 
+      }
 
       if (errorMessage) {
         e.preventDefault(); // Verhindert das Absenden des Formulars
@@ -338,7 +291,7 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
         notesErrorMessage = `Die Bemerkung muss mindestens ${minLength} Zeichen lang sein.`;
       } else if (valuenotes.length > maxLength) {
         notesErrorMessage = `Die Bemerkung darf maximal ${maxLength} Zeichen lang sein.`;
-      } 
+      }
       if (notesErrorMessage) {
         e.preventDefault(); // Verhindert das Absenden des Formulars
         notesError.textContent = notesErrorMessage;

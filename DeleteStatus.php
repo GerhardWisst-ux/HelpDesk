@@ -1,42 +1,34 @@
 <head>
-  <title>HelpDesk Prioritäten - Eintrag löschen</title>
+  <title>HelpDesk Stati - Eintrag löschen</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">  
+  <!-- CSS -->
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- JS -->
+  <script src="js/jquery.min.js"></script>
+  <script src="js/bootstrap.bundle.min.js"></script>
 </head>
 
 <body>
+  
   <?php
   require 'db.php';
   session_start();
-
-  if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['StatusID'])) {
-    $statusId = $_POST['StatusID'];
-    // Löschen aus der Datenbank
-} else {
-    echo "Keine Status-ID empfangen.";
-}
-
-  echo $StatusID;
-
-  if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['StatusID'])) {
-    $statusId = (int) $_POST['StatusID']; // Typensicherheit
-
-    $sql = "DELETE FROM status WHERE StatusID = :StatusID";
+  
+  if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
+    $id = intval($_POST['id']);
+    $sql = "DELETE FROM status WHERE StatusID = :id";
     $stmt = $pdo->prepare($sql);
-
-    if ($stmt->execute([':StatusID' => $statusId])) {
-        echo "Status erfolgreich gelöscht.";
-    } else {
-        echo "Fehler beim Löschen.";
-    }
-
+    $stmt->execute(['id' => $id]);    
+    echo "Status - Status mit der ID" . $id . " wurde gelöscht!";
     sleep(1);
-    header('Location: Stati.php'); // Zurück zur Übersicht
-} 
-else
-{
+    header('Location: Stati.php'); 
+    
+  } else {
     echo "Ungültige Anfrage.";
-}
+  }
+
 
   ?>
 </body>

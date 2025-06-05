@@ -23,7 +23,7 @@
     // Regeln
     $minLength = 3;
     $maxLength = 100;
-    $alphanumericRegex = '/^[a-zA-Z0-9äöüÄÖÜß\s\-:]+$+$/';
+    $alphanumericRegex = '/[A-Za-zäöüßÄÖÜß\s\-]+(?:\s\d+[a-zA-Z]?)?$/';
 
     // Validierung
     if (strlen($description) < $minLength) {
@@ -108,7 +108,7 @@
 
     echo "Ticket hinzugefügt!";
     sleep(1);
-    header('notes: TicketUebersicht.php'); // Zurück zur Übersicht
+    header('Location: TicketUebersicht.php'); // Zurück zur Übersicht    
   
   }
   ?>

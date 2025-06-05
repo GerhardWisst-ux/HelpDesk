@@ -3,7 +3,7 @@ require 'db.php';
 session_start();
 
 // Regeln
-$alphanumericRegex = '/^[a-zA-Z0-9äöüÄÖÜß\s\-:]+$/';
+$alphanumericRegex = '/[A-Za-zäöüßÄÖÜß\s\-]+(?:\s\d+[a-zA-Z]?)?$/';
 $minLength = 3;
 $maxLength = 100;
 
@@ -49,22 +49,22 @@ if (!validateDate($dueDate)) {
     die("Fehler: Zu erledigen bis ist kein gültiges Datum");
 }
 
+//print_r($_POST);
+
 $statusid = trim($_POST['statusid']);
 echo $statusid;
-if (!is_int($statusid) || $statusid == 0) {
-    die("Fehler: Wert in Status ist nicht gültig " . $statusid);
+if (!ctype_digit((string)$statusid) || (int)$statusid == 0) {
+    die("Fehler: Wert in statusid ist nicht gültig " . $statusid);
 }
 
 $priorityid = trim($_POST['priorityid']);
-echo $priorityid;
-if (!is_int($priorityid) || $priorityid == 0) {
-    die("Fehler: Wert in Priortät ist nicht gültig:" . $priorityid);
+if (!ctype_digit((string)$priorityid) || (int)$priorityid == 0) {
+    die("Fehler: Wert in priorityid ist nicht gültig " . $priorityid);
 }
 
 $customerid = trim($_POST['customerid']);
-echo $customerid;
-if (!is_int($customerid) || $customerid == 0) {
-    die("Fehler: Wert in Kunden ist nicht gültig:" . $customerid);
+if (!ctype_digit((string)$priorityid) || (int)$customerid == 0) {
+    die("Fehler: Wert in customerid ist nicht gültig " . $customerid);
 }
 
 function validateDate($date, $format = 'Y-m-d')
