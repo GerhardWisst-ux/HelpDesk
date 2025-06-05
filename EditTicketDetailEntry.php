@@ -47,8 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
 {
     // print_r($_POST);
     $TicketDetailID = $_SESSION['TicketDetailID'];
-    $TicketID = $_SESSION['TicketID'];
-    $servicedatetime = date('Y-m-d H:i');        
+    $TicketID = $_SESSION['TicketID'];   
     $description = htmlspecialchars($_POST['description'], ENT_QUOTES, 'UTF-8');
     $notes = htmlspecialchars($_POST['notes'], ENT_QUOTES, 'UTF-8');
     $billingHours = htmlspecialchars($_POST['billingHours'], ENT_QUOTES, 'UTF-8');
@@ -56,8 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
     try {
         // Update-Statement
         $sql = "UPDATE ticketdetail 
-                SET ticketID = :ticketID,
-                    servicedatetime = :servicedatetime,
+                SET ticketID = :ticketID,                    
                     billingHours = :billingHours,                       
                     description = :description,
                     notes = :notes 
@@ -65,8 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             'TicketDetailID' => $TicketDetailID,
-            'ticketID' => $TicketID,
-            'servicedatetime' => $servicedatetime,            
+            'ticketID' => $TicketID,            
             'billingHours' => $billingHours,           
             'description' => $description,
             'notes' => $notes,
@@ -76,9 +73,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
         header('Location: ShowTickets.php?TicketID=' . $_SESSION['TicketID']); // Zurück zur Übersicht    
         exit();
     } catch (PDOException $e) {
-        echo "Fehler beim Aktualisieren: " . $e->getMessage();
-        echo "Griebus";
-        //exit();
+        echo "Fehler beim Aktualisieren: " . $e->getMessage();       
+        exit();
     }
 }
 ?>

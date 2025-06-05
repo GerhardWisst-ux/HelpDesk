@@ -40,23 +40,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $mst_id = $last_id;
-        $productname = $row['Description'] . "<br>" . $row['Notes'];
-        $amount = $row['BillingHours'] * 70;
+        $productname = $row['Notes'];
+        $amount = $row['BillingHours'] * 50;
         $positiontax = 1;
 
         // Detailsätze schreiben
-        $sqlIns = "INSERT INTO invoice_det (MST_ID, PRODUCT_NAME, AMOUNT,POSITIONTAX) VALUES (:MST_ID, :PRODUCT_NAME, :AMOUNT, :POSITIONTAX)";
+        $sqlIns = "INSERT INTO invoice_det (MST_ID, PRODUCT_NAME, AMOUNT, NUMBER, POSITIONTAX, Hours) VALUES (:MST_ID, :PRODUCT_NAME, :AMOUNT, :NUMBER, :POSITIONTAX, :Hours)";
         $stmtIns = $pdo->prepare($sqlIns);
-        $stmtIns->execute(['MST_ID' => $mst_id, 'PRODUCT_NAME' => $productname, 'AMOUNT' => $amount, 'POSITIONTAX' => $positiontax]);
-
+        $stmtIns->execute(['MST_ID' => $mst_id, 'PRODUCT_NAME' => $productname, 'AMOUNT' => $amount, 'NUMBER' => 70, 'POSITIONTAX' => $positiontax ,'Hours' => $row['BillingHours']]);
     }
 
     $closedDate = $dateTime->format('Y-m-d H:i:s');
-    $sql = "UPDATE ticket SET ClosedDate = :closedDate WHERE TicketID = :ticketID";
+    $sql = "UPDATE ticket SET ClosedDate = :closedDate, StatusID = :statusid  WHERE TicketID = :ticketID";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
         ':closedDate' => $closedDate,
+        ':statusid' => 6,
         ':ticketID' => $TicketID
     ]);
 

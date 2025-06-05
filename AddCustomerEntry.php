@@ -92,11 +92,12 @@
     $mail = $_POST['mail'];
     $fax = $_POST['fax'];
     $internet = $_POST['internet'];
+    $zip = $_POST['zip'];
     $countryID = 1;
 
-    $sql = "INSERT INTO customer (zusatz, firma, street, telefon, fax, internet,location, mail, countryid ) VALUES (:zusatz, :firma, :street, :telefon, :fax , :internet, :location, :mail, :countryid)";
+    $sql = "INSERT INTO customer (zusatz, firma, street, zip, telefon, fax, internet,location, mail, countryid ) VALUES (:zusatz, :firma, :street, :zip, :telefon, :fax , :internet, :location, :mail, :countryid)";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['zusatz' => $zusatz, 'firma' => $firma, 'street' => $street, 'telefon' => $telefon, 'fax' => $fax, 'internet' => $internet, 'location' => $location, 'mail' => $mail, 'countryid' => $countryID]);
+    $stmt->execute(['zusatz' => $zusatz, 'firma' => $firma, 'street' => $street, 'telefon' => $telefon, 'fax' => $fax, 'internet' => $internet, 'zip' => $zip, 'location' => $location, 'mail' => $mail, 'countryid' => $countryID]);
 
     echo "Kunde hinzugefügt!";
     sleep(3);

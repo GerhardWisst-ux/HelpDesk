@@ -23,6 +23,7 @@ $mail = trim($_POST['mail']);
 $internet = trim($_POST['internet']);
 $telefon = trim($_POST['telefon']);
 $fax = trim($_POST['fax']);
+$zip = trim($_POST['zip']);
 
 // Validierung
 if (strlen($zusatz) > $maxLength) {
@@ -100,6 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $internet = htmlspecialchars($_POST['internet'], ENT_QUOTES, 'UTF-8');
     $telefon = htmlspecialchars($_POST['telefon'], ENT_QUOTES, 'UTF-8');
     $fax = htmlspecialchars($_POST['fax'], ENT_QUOTES, 'UTF-8');
+    $zip = htmlspecialchars($_POST['zip'], ENT_QUOTES, 'UTF-8');
 
 
     if (!isset($_POST['active']) || $_POST['active'] == "")
@@ -113,6 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 SET zusatz = :zusatz, 
                     firma = :firma, 
                     street = :street, 
+                    zip = :zip,   
                     location = :location,   
                     mail = :mail,
                     internet = :internet,
@@ -126,6 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'zusatz' => $zusatz,
             'firma' => $firma,
             'street' => $street,
+            'zip' => $zip,
             'location' => $location,
             'mail' => $mail,
             'internet' => $internet,

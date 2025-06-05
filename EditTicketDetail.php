@@ -186,8 +186,8 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
           <div class="form-group row">
             <label class="col-sm-2 col-form-label text-dark">Berechnete Stunden:</label>
             <div class="col-sm-10">
-              <input id="billingHours" class="form-control" type="number" name="billingHours"
-                value="<?= htmlspecialchars($result['BillingHours']) ?>">
+              <input id="billingHours" class="form-control" type='number' step='0.01' placeholder='0.00' name="billingHours"
+                value="<?= number_format($result['BillingHours'], 2, '.', ',')  ?>">
               <small id="billingHoursError" class="text-danger"></small>
             </div>
           </div>

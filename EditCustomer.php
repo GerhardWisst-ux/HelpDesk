@@ -5,7 +5,7 @@
 ob_start();
 session_start();
 if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
-  header('Location: Login.php'); // zum Loginformular
+    header('Location: Login.php'); // zum Loginformular
 }
 ?>
 
@@ -22,59 +22,59 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
     <script src="js/bootstrap.bundle.min.js"></script>
 
     <style>
-    /* Allgemeine Einstellungen */
-    body {
-        font-family: 'Arial', sans-serif;
-        background-color: #f4f7f6;
-        margin: 0;
-        padding: 0;
-    }
+        /* Allgemeine Einstellungen */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+        }
 
-    .topnav .icon {
-        display: none;
-    }
+        .topnav .icon {
+            display: none;
+        }
 
-    label {
-        font-size: 14px;
-        font-weight: 600;
-        color: #333;
-    }
+        label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
 
-    /* Tabelle Margins */
-    .custom-container table {
-        margin-left: 1.2rem !important;
-        margin-right: 1.2rem !important;
-        width: 98%;
-    }
-
-    .me-4 {
-        margin-left: 1.2rem !important;
-    }
-
-    .custom-checkbox {
-        margin-top: 0.2rem !important;
-        width: 20px;
-        /* Breite der Checkbox */
-        height: 20px;
-        /* Höhe der Checkbox */
-
-        /* Alternativ: Skalierung */
-        cursor: pointer;
-        /* Zeigt, dass es anklickbar ist */
-    }
-
-    /* Spaltenbreiten optimieren */
-    @media screen and (max-width: 767px) {
+        /* Tabelle Margins */
         .custom-container table {
-            margin-left: 0.2rem !important;
-            margin-right: 0.2rem !important;
+            margin-left: 1.2rem !important;
+            margin-right: 1.2rem !important;
             width: 98%;
         }
 
         .me-4 {
-            margin-left: 0.2rem !important;
+            margin-left: 1.2rem !important;
         }
-    }
+
+        .custom-checkbox {
+            margin-top: 0.2rem !important;
+            width: 20px;
+            /* Breite der Checkbox */
+            height: 20px;
+            /* Höhe der Checkbox */
+
+            /* Alternativ: Skalierung */
+            cursor: pointer;
+            /* Zeigt, dass es anklickbar ist */
+        }
+
+        /* Spaltenbreiten optimieren */
+        @media screen and (max-width: 767px) {
+            .custom-container table {
+                margin-left: 0.2rem !important;
+                margin-right: 0.2rem !important;
+                width: 98%;
+            }
+
+            .me-4 {
+                margin-left: 0.2rem !important;
+            }
+        }
     </style>
 </head>
 
@@ -82,33 +82,33 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
 
     <?php
 
-  require 'db.php';
+    require 'db.php';
 
-  // Fehler anzeigen
-  error_reporting(E_ALL);
-  ini_set('display_errors', 1);
+    // Fehler anzeigen
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
 
-  // Prüfen, ob die Verbindung zur Datenbank steht
-  if (!$pdo) {
-    die("Datenbankverbindung fehlgeschlagen: " . mysqli_connect_error());
-  }
+    // Prüfen, ob die Verbindung zur Datenbank steht
+    if (!$pdo) {
+        die("Datenbankverbindung fehlgeschlagen: " . mysqli_connect_error());
+    }
 
-  $email = $_SESSION['email'];
-
-  // Abfrage der E-Mail vom Login
-  $email = $_SESSION['email'];
-  if (isset($_GET['CustomerID'])) {
-    $id = $_GET['CustomerID'];
-    $_SESSION['CustomerID'] = $_GET['CustomerID'];
     $email = $_SESSION['email'];
-    $sql = "Select * FROM customer WHERE CustomerID = :id";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute(['id' => $id]);
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-  } else {
-    echo "Keine CustomerID angegeben.";
-  }
-  ?>
+
+    // Abfrage der E-Mail vom Login
+    $email = $_SESSION['email'];
+    if (isset($_GET['CustomerID'])) {
+        $id = $_GET['CustomerID'];
+        $_SESSION['CustomerID'] = $_GET['CustomerID'];
+        $email = $_SESSION['email'];
+        $sql = "Select * FROM customer WHERE CustomerID = :id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['id' => $id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    } else {
+        echo "Keine CustomerID angegeben.";
+    }
+    ?>
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
@@ -183,6 +183,14 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
                         </div>
                     </div>
                     <div class="form-group row">
+                        <label class="col-sm-2 col-form-label text-dark">PLZ:</label>
+                        <div class="col-sm-10">
+                            <input id="zip" class="form-control" type="text" name="zip"
+                                value="<?= htmlspecialchars($result['ZIP']) ?>">
+                            <small id="zipError" class="text-danger"></small>
+                        </div>
+                    </div>
+                    <div class="form-group row">
                         <label class="col-sm-2 col-form-label text-dark">Ort:</label>
                         <div class="col-sm-10">
                             <input id="location" class="form-control" type="text" name="location"
@@ -244,7 +252,7 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
                         <div class="col-sm-1">
                             <?php $isActive = $result['Active']; ?>
                             <input type="checkbox" name="active" id="active" class="custom-checkbox" value="yes"
-                                <?= $isActive == 1 ? 'checked' : '' ?>>                            
+                                <?= $isActive == 1 ? 'checked' : '' ?>>
                         </div>
                     </div>
 
@@ -252,7 +260,7 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
                         <label class="col-sm-2 col-form-label text-dark">Bemerkung:</label>
                         <div class="col-sm-10">
                             <input id="notes" class="form-control" type="text" name="notes"
-                                value="<?= htmlspecialchars($result['Notes']) ?>">                            
+                                value="<?= htmlspecialchars($result['Notes']) ?>">
                         </div>
                     </div>
 
@@ -270,218 +278,218 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
     </div>
 
     <script>
-    // Heutiges Datum automatisch setzen
-    document.addEventListener("DOMContentLoaded", function() {
-        const today = new Date();
-        const formattedDate = today.toISOString().split('T')[0];
-        document.getElementById("datum").value = formattedDate;
-    });
+        // Heutiges Datum automatisch setzen
+        document.addEventListener("DOMContentLoaded", function () {
+            const today = new Date();
+            const formattedDate = today.toISOString().split('T')[0];
+            document.getElementById("datum").value = formattedDate;
+        });
 
-    function NavBarClick() {
-        const topnav = document.getElementById("myTopnav");
-        if (topnav.className === "topnav") {
-            topnav.className += " responsive";
-        } else {
-            topnav.className = "topnav";
-        }
-    }
-
-    function toggleCustomInput(select) {
-
-        const customInput = document.getElementById('custom-input');
-        if (select.value === 'custom') {
-            customInput.classList.remove('d-none');
-            customInput.removeAttribute('disabled');
-            customInput.setAttribute('required', 'required');
-        } else {
-            customInput.classList.add('d-none');
-            customInput.setAttribute('disabled', 'disabled');
-            customInput.removeAttribute('required');
-            customInput.value = '';
+        function NavBarClick() {
+            const topnav = document.getElementById("myTopnav");
+            if (topnav.className === "topnav") {
+                topnav.className += " responsive";
+            } else {
+                topnav.className = "topnav";
+            }
         }
 
-        const customLabel = document.getElementById('custom-label');
-        if (select.value === 'custom') {
-            customLabel.classList.remove('d-none');
-        } else {
-            customLabel.classList.add('d-none');
+        function toggleCustomInput(select) {
+
+            const customInput = document.getElementById('custom-input');
+            if (select.value === 'custom') {
+                customInput.classList.remove('d-none');
+                customInput.removeAttribute('disabled');
+                customInput.setAttribute('required', 'required');
+            } else {
+                customInput.classList.add('d-none');
+                customInput.setAttribute('disabled', 'disabled');
+                customInput.removeAttribute('required');
+                customInput.value = '';
+            }
+
+            const customLabel = document.getElementById('custom-label');
+            if (select.value === 'custom') {
+                customLabel.classList.remove('d-none');
+            } else {
+                customLabel.classList.add('d-none');
+            }
+
+            const Label = document.getElementById('label');
+            if (select.value === 'custom') {
+                Label.classList.add('d-none');
+            } else {
+                Label.classList.remove('d-none');
+            }
+
+            // Debug-Ausgabe
+            console.log("Aktueller Wert:", select.value || "Keiner ausgewählt");
         }
 
-        const Label = document.getElementById('label');
-        if (select.value === 'custom') {
-            Label.classList.add('d-none');
-        } else {
-            Label.classList.remove('d-none');
-        }
+        document.querySelector('form').addEventListener('submit', function (e) {
+            const firmaInput = document.getElementById('firma');
+            const firmaError = document.getElementById('firmaError');
+            const value = firmaInput.value.trim();
 
-        // Debug-Ausgabe
-        console.log("Aktueller Wert:", select.value || "Keiner ausgewählt");
-    }
+            const minLength = 3;
+            const maxLength = 100;
 
-    document.querySelector('form').addEventListener('submit', function(e) {
-        const firmaInput = document.getElementById('firma');
-        const firmaError = document.getElementById('firmaError');
-        const value = firmaInput.value.trim();
 
-        const minLength = 3;
-        const maxLength = 100;
-                
+            let firmaErrorMessage = '';
 
-        let firmaErrorMessage = '';
+            // Validierung für Nachnamen
+            if (value.length < minLength) {
+                firmaErrorMessage = `Die Firma muss mindestens ${minLength} Zeichen lang sein.`;
+            } else if (value.length > maxLength) {
+                firmaErrorMessage = `Der Firma darf maximal ${maxLength} Zeichen lang sein.`;
+            }
 
-        // Validierung für Nachnamen
-        if (value.length < minLength) {
-            firmaErrorMessage = `Die Firma muss mindestens ${minLength} Zeichen lang sein.`;
-        } else if (value.length > maxLength) {
-            firmaErrorMessage = `Der Firma darf maximal ${maxLength} Zeichen lang sein.`;
-        } 
+            if (firmaErrorMessage) {
+                e.preventDefault(); // Verhindert das Absenden des Formulars
+                firmaError.textContent = firmaErrorMessage;
+            } else {
+                firmaError.textContent = ''; // Fehlernachricht zurücksetzen
+            }
 
-        if (firmaErrorMessage) {
-            e.preventDefault(); // Verhindert das Absenden des Formulars
-            firmaError.textContent = firmaErrorMessage;
-        } else {
-            firmaError.textContent = ''; // Fehlernachricht zurücksetzen
-        }
+            const streetInput = document.getElementById('street');
+            const streetError = document.getElementById('streetError');
+            const valueStreet = streetInput.value.trim();
 
-        const streetInput = document.getElementById('street');
-        const streetError = document.getElementById('streetError');
-        const valueStreet = streetInput.value.trim();
+            let streetErrorMessage = '';
 
-        let streetErrorMessage = '';
+            // Validierung für Straße
+            if (valueStreet.length < minLength) {
+                streetErrorMessage = `Die Straße muss mindestens ${minLength} Zeichen lang sein.`;
+            } else if (valueStreet.length > maxLength) {
+                streetErrorMessage = `Die Straße darf maximal ${maxLength} Zeichen lang sein.`;
+            }
 
-        // Validierung für Straße
-        if (valueStreet.length < minLength) {
-            streetErrorMessage = `Die Straße muss mindestens ${minLength} Zeichen lang sein.`;
-        } else if (valueStreet.length > maxLength) {
-            streetErrorMessage = `Die Straße darf maximal ${maxLength} Zeichen lang sein.`;
-        } 
+            if (streetErrorMessage) {
+                e.preventDefault(); // Verhindert das Absenden des Formulars
+                streetError.textContent = streetErrorMessage;
+            } else {
+                streetError.textContent = ''; // Fehlernachricht zurücksetzen
+            }
 
-        if (streetErrorMessage) {
-            e.preventDefault(); // Verhindert das Absenden des Formulars
-            streetError.textContent = streetErrorMessage;
-        } else {
-            streetError.textContent = ''; // Fehlernachricht zurücksetzen
-        }
+            const locationInput = document.getElementById('location');
+            const locationError = document.getElementById('locationError');
+            const valueLocation = locationInput.value.trim();
 
-        const locationInput = document.getElementById('location');
-        const locationError = document.getElementById('locationError');
-        const valueLocation = locationInput.value.trim();
+            let locationErrorMessage = '';
 
-        let locationErrorMessage = '';
+            // Validierung für Ort
+            if (valueLocation.length < minLength) {
+                locationErrorMessage = `Der Ort muss mindestens ${minLength} Zeichen lang sein.`;
+            } else if (valueLocation.length > maxLength) {
+                locationErrorMessage = `Der Ort darf maximal ${maxLength} Zeichen lang sein.`;
+            }
 
-        // Validierung für Ort
-        if (valueLocation.length < minLength) {
-            locationErrorMessage = `Der Ort muss mindestens ${minLength} Zeichen lang sein.`;
-        } else if (valueLocation.length > maxLength) {
-            locationErrorMessage = `Der Ort darf maximal ${maxLength} Zeichen lang sein.`;
-        } 
+            if (locationErrorMessage) {
+                e.preventDefault(); // Verhindert das Absenden des Formulars
+                locationError.textContent = locationErrorMessage;
+            } else {
+                locationError.textContent = ''; // Fehlernachricht zurücksetzen
+            }
 
-        if (locationErrorMessage) {
-            e.preventDefault(); // Verhindert das Absenden des Formulars
-            locationError.textContent = locationErrorMessage;
-        } else {
-            locationError.textContent = ''; // Fehlernachricht zurücksetzen
-        }
+            const telefonInput = document.getElementById('telefon');
+            const telefonError = document.getElementById('telefonError');
+            const valueTelefon = telefonInput.value.trim();
 
-        const telefonInput = document.getElementById('telefon');
-        const telefonError = document.getElementById('telefonError');
-        const valueTelefon = telefonInput.value.trim();
+            let telefonErrorMessage = '';
 
-        let telefonErrorMessage = '';
+            // Validierung für Telefon
+            if (valueTelefon.length < minLength) {
+                telefonErrorMessage = `Das Telefon muss mindestens ${minLength} Zeichen lang sein.`;
+            } else if (valueTelefon.length > maxLength) {
+                telefonErrorMessage = `Das Telefon darf maximal ${maxLength} Zeichen lang sein.`;
+            }
 
-        // Validierung für Telefon
-        if (valueTelefon.length < minLength) {
-            telefonErrorMessage = `Das Telefon muss mindestens ${minLength} Zeichen lang sein.`;
-        } else if (valueTelefon.length > maxLength) {
-            telefonErrorMessage = `Das Telefon darf maximal ${maxLength} Zeichen lang sein.`;
-        } 
+            if (telefonErrorMessage) {
+                e.preventDefault();
+                telefonError.textContent = telefonErrorMessage;
+            } else {
+                telefonError.textContent = ''; // Fehlernachricht zurücksetzen
+            }
 
-        if (telefonErrorMessage) {
-            e.preventDefault();
-            telefonError.textContent = telefonErrorMessage;
-        } else {
-            telefonError.textContent = ''; // Fehlernachricht zurücksetzen
-        }
+            const faxInput = document.getElementById('fax');
+            const faxError = document.getElementById('faxError');
+            const valuefax = faxInput.value.trim();
 
-        const faxInput = document.getElementById('fax');
-        const faxError = document.getElementById('faxError');
-        const valuefax = faxInput.value.trim();
+            let faxErrorMessage = '';
 
-        let faxErrorMessage = '';
+            // Validierung für fax
+            if (valuefax.length < minLength) {
+                faxErrorMessage = `Das Fax muss mindestens ${minLength} Zeichen lang sein.`;
+            } else if (valuefax.length > maxLength) {
+                faxErrorMessage = `Das Fax darf maximal ${maxLength} Zeichen lang sein.`;
+            }
 
-        // Validierung für fax
-        if (valuefax.length < minLength) {
-            faxErrorMessage = `Das Fax muss mindestens ${minLength} Zeichen lang sein.`;
-        } else if (valuefax.length > maxLength) {
-            faxErrorMessage = `Das Fax darf maximal ${maxLength} Zeichen lang sein.`;
-        }
+            if (faxErrorMessage) {
+                e.preventDefault();
+                faxError.textContent = faxErrorMessage;
+            } else {
+                faxError.textContent = ''; // Fehlernachricht zurücksetzen
+            }
 
-        if (faxErrorMessage) {
-            e.preventDefault();
-            faxError.textContent = faxErrorMessage;
-        } else {
-            faxError.textContent = ''; // Fehlernachricht zurücksetzen
-        }
+            const mailInput = document.getElementById('mail');
+            const mailError = document.getElementById('mailError');
+            const valuemail = mailInput.value.trim();
 
-        const mailInput = document.getElementById('mail');
-        const mailError = document.getElementById('mailError');
-        const valuemail = mailInput.value.trim();
+            let mailErrorMessage = '';
 
-        let mailErrorMessage = '';
+            // Validierung für Mail
+            if (valuemail.length < minLength) {
+                mailErrorMessage = `Die Mailadresse muss mindestens ${minLength} Zeichen lang sein.`;
+            } else if (valuemail.length > maxLength) {
+                mailErrorMessage = `Die Mailadresse darf maximal ${maxLength} Zeichen lang sein.`;
+            }
 
-        // Validierung für Mail
-        if (valuemail.length < minLength) {
-            mailErrorMessage = `Die Mailadresse muss mindestens ${minLength} Zeichen lang sein.`;
-        } else if (valuemail.length > maxLength) {
-            mailErrorMessage = `Die Mailadresse darf maximal ${maxLength} Zeichen lang sein.`;
-        } 
+            if (mailErrorMessage) {
+                e.preventDefault(); // Verhindert das Absenden des Formulars
+                mailError.textContent = mailErrorMessage;
+            } else {
+                mailError.textContent = ''; // Fehlernachricht zurücksetzen
+            }
 
-        if (mailErrorMessage) {
-            e.preventDefault(); // Verhindert das Absenden des Formulars
-            mailError.textContent = mailErrorMessage;
-        } else {
-            mailError.textContent = ''; // Fehlernachricht zurücksetzen
-        }
+            const internetInput = document.getElementById('internet');
+            const internetError = document.getElementById('internetError');
+            const valueinternet = internetInput.value.trim();
 
-        const internetInput = document.getElementById('internet');
-        const internetError = document.getElementById('internetError');
-        const valueinternet = internetInput.value.trim();
+            let internetErrorMessage = '';
 
-        let internetErrorMessage = '';
+            // Validierung für Internet
+            if (valueinternet.length < minLength) {
+                internetErrorMessage = `Die Internetadresse muss mindestens ${minLength} Zeichen lang sein.`;
+            } else if (valueinternet.length > maxLength) {
+                internetErrorMessage = `Die Internetadresse darf maximal ${maxLength} Zeichen lang sein.`;
+            }
 
-        // Validierung für Internet
-        if (valueinternet.length < minLength) {
-            internetErrorMessage = `Die Internetadresse muss mindestens ${minLength} Zeichen lang sein.`;
-        } else if (valueinternet.length > maxLength) {
-            internetErrorMessage = `Die Internetadresse darf maximal ${maxLength} Zeichen lang sein.`;
-        } 
+            if (internetErrorMessage) {
+                e.preventDefault(); // Verhindert das Absenden des Formulars
+                internetError.textContent = internetErrorMessage;
+            } else {
+                internetError.textContent = ''; // Fehlernachricht zurücksetzen
+            }
 
-        if (internetErrorMessage) {
-            e.preventDefault(); // Verhindert das Absenden des Formulars
-            internetError.textContent = internetErrorMessage;
-        } else {
-            internetError.textContent = ''; // Fehlernachricht zurücksetzen
-        }
+            const kundeseitInput = document.getElementById('kundeseit');
+            const kundeseitError = document.getElementById('kundeseitError');
+            const valuekundeseit = kundeseitInput.value.trim();
 
-        const kundeseitInput = document.getElementById('kundeseit');
-        const kundeseitError = document.getElementById('kundeseitError');
-        const valuekundeseit = kundeseitInput.value.trim();
+            let kundeseitErrorMessage = '';
 
-        let kundeseitErrorMessage = '';
+            // Validierung für KundeSeit
+            if (valuekundeseit.length = 0) {
+                kundeseitErrorMessage = `Kundeseit muss gefüllt seinsein.`;
+            } else if (valuekundeseit.length < > 4) {
+                kundeseitErrorMessage = 'Kundeseit muß 4 stellig sein.';
+            }
 
-        // Validierung für KundeSeit
-        if (valuekundeseit.length = 0) {
-            kundeseitErrorMessage = `Kundeseit muss gefüllt seinsein.`;
-        } else if (valuekundeseit.length < > 4) {
-            kundeseitErrorMessage = 'Kundeseit muß 4 stellig sein.';
-        }
+            if (kundeseitErrorMessage) {
+                e.preventDefault(); // Verhindert das Absenden des Formulars
+                kundeseitError.textContent = kundeseitErrorMessage;
+            } else {
+                kundeseitError.textContent = ''; // Fehlernachricht zurücksetzen
+            }
 
-        if (kundeseitErrorMessage) {
-            e.preventDefault(); // Verhindert das Absenden des Formulars
-            kundeseitError.textContent = kundeseitErrorMessage;
-        } else {
-            kundeseitError.textContent = ''; // Fehlernachricht zurücksetzen
-        }
-
-    });
+        });
     </script>

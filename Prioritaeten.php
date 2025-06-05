@@ -170,9 +170,9 @@ if ($_SESSION['userid'] == "") {
                     <table id="TablePrioritäten" class="display nowrap">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>SortOrder</th>
-                                <th>Beschreibung</th>
+                                <th>ID</th>                                
+                                <th style="width:1000px;">Beschreibung</th>
+                                <th style="text-align:right;">SortOrder</th>
                                 <th></th>
 
                             </tr>
@@ -185,9 +185,9 @@ if ($_SESSION['userid'] == "") {
                             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
                                 echo "<tr>
-                                    <td>{$row['PriorityID']}</td>
-                                    <td style='text-align:right;'>{$row['SortOrder']}</td>
+                                    <td>{$row['PriorityID']}</td>                                    
                                     <td>{$row['Description']}</td>
+                                    <td style='text-align:right;'>{$row['SortOrder']}</td>
                                     <td style='vertical-align: top; width:7%; white-space: nowrap;'>
                                         <a href='EditPriority.php?PriorityID={$row['PriorityID']}' style='width:60px;' title='Priorität bearbeiten' class='btn btn-primary btn-sm'><i class='fa-solid fa-pen-to-square'></i></a>
                                         <a href='DeletePriority.php?PriorityID={$row['PriorityID']}' style='width:60px;' data-id={$row['PriorityID']} title='Priorität löschen' class='btn btn-danger btn-sm delete-button'><i class='fa-solid fa-trash'></i></a>

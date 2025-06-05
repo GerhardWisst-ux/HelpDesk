@@ -217,7 +217,7 @@ if ($_SESSION['userid'] == "") {
                 </div>
                 <br>
             </div>
-            <br>           
+            <br>
             <div class="form-group row me-4">
                 <label class="col-sm-2 col-form-label text-dark">Firma:</label>
                 <div class="col-sm-10">
@@ -227,7 +227,7 @@ if ($_SESSION['userid'] == "") {
                     </div>
                 </div>
             </div>
-             <div class="form-group row me-4">
+            <div class="form-group row me-4">
                 <label class="col-sm-2 col-form-label text-dark">Zusatz:</label>
                 <div class="col-sm-10">
                     <input class="form-control" type="text" id="zusatz" name="zusatz">
@@ -239,6 +239,13 @@ if ($_SESSION['userid'] == "") {
                 <div class="col-sm-10">
                     <input id="street" class="form-control" type="text" name="street">
                     <small id="streetError" class="text-danger"></small>
+                </div>
+            </div>
+            <div class="form-group row me-4">
+                <label class="col-sm-2 col-form-label text-dark">ZIP:</label>
+                <div class="col-sm-10">
+                    <input id="zip" class="form-control" type="number" name="zip">
+                    <small id="zipError" class="text-danger"></small>
                 </div>
             </div>
             <div class="form-group row me-4">

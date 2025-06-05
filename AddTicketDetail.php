@@ -219,15 +219,13 @@ if ($_SESSION['userid'] == "") {
                     <small id="billingHoursError" class="text-danger"></small>
                 </div>
             </div>
-
-
             <div class="form-group row me-4">
                 <div class="col-sm-offset-2 col-sm-10">
                     <button class="btn btn-primary" type="submit"><i class="fas fa-save"></i></button>
                     <a href="ShowTickets.php" title="Zurück zur Hauptübersicht" class="btn btn-primary"><i
                             class="fa fa-arrow-left" aria-hidden="true"></i></a>
                 </div>
-            </div>
+            </div>         
         </form>
     </div>
 

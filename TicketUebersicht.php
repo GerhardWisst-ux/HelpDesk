@@ -48,8 +48,8 @@ if ($_SESSION['userid'] == "") {
         }
 
         .dataTables_wrapper .dataTables_length select,
-      .dataTables_wrapper .dataTables_filter,
-      .dataTables_info {
+        .dataTables_wrapper .dataTables_filter,
+        .dataTables_info {
             margin-left: 1.2rem !important;
             margin-right: 0.8rem !important;
         }
@@ -73,8 +73,28 @@ if ($_SESSION['userid'] == "") {
             /* Grün für abgeschlossene Tickets */
         }
 
+        #TableTickets td:nth-child(2),
+        /* Beschreibung */
+        #TableTickets td:nth-child(3) {
+            /* Bemerkung */
+            max-width: 200px;
+            /* Maximale Breite der Spalten */
+            word-wrap: break-word;
+            /* Längerer Text wird umgebrochen */
+            white-space: normal;
+            /* Umbruch innerhalb der Zellen erlauben */
+            vertical-align: top;
+        }
+
         /* Spaltenbreiten optimieren */
-        @media screen and (max-width: 767px) {
+        @media screen and (max-width: 768px) {
+
+            #TableTickets td {
+                vertical-align: top;
+                /* Inhalte oben ausrichten */
+                white-space: normal;
+                /* Text umbrechen */
+            }
 
             .custom-container table {
                 margin-left: 0.2rem !important;
@@ -105,7 +125,9 @@ if ($_SESSION['userid'] == "") {
             #TableTickets td:nth-child(3),
             #TableTickets th:nth-child(4),
             #TableTickets td:nth-child(5),
-            #TableTickets td:nth-child(6) {
+            #TableTickets td:nth-child(6),
+            #TableTickets td:nth-child(7),
+            #TableTickets td:nth-child(8) {
                 display: table-cell;
 
             }
@@ -191,16 +213,18 @@ if ($_SESSION['userid'] == "") {
                             <tr>
                                 <th>TicketID</th>
                                 <th>Beschreibung</th>
+                                <th>Bemerkung</th>
                                 <th>Datum</th>
                                 <th>Zu erledigen bis</th>
                                 <th>Kunde</th>
                                 <th>Priorität</th>
                                 <th>Status</th>
+                                <th>Aktion</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php
-                            $sql = "SELECT TicketID, ticket.Description, CreatedDate, DueDate, ClosedDate, ticket.PriorityID, priority.Description  as PriorityText, priority.SortOrder, ticket.StatusID, status.Description as StatusText, ticket.CustomerID, customer.Firma, customer.Zusatz FROM ticket inner join status on ticket.StatusID = status.StatusID inner join priority on ticket.PriorityID = priority.PriorityID inner join customer on ticket.CustomerID = customer.CustomerID where ticket.UserID = :userid ORDER BY CreatedDate DESC";
+                            $sql = "SELECT TicketID, ticket.Description, ticket.Notes, CreatedDate, DueDate, ClosedDate, ticket.PriorityID, priority.Description  as PriorityText, priority.SortOrder, ticket.StatusID, status.Description as StatusText, ticket.CustomerID, customer.Firma, customer.Zusatz FROM ticket inner join status on ticket.StatusID = status.StatusID inner join priority on ticket.PriorityID = priority.PriorityID inner join customer on ticket.CustomerID = customer.CustomerID where ticket.UserID = :userid ORDER BY CreatedDate DESC";
                             $stmt = $pdo->prepare($sql);
                             $stmt->execute(['userid' => $userid]);
 
@@ -223,9 +247,10 @@ if ($_SESSION['userid'] == "") {
                                 echo "<tr class='$class'>
                                     <td>{$row['TicketID']}</td>
                                     <td>{$row['Description']}</td>
+                                    <td>{$row['Notes']}</td>
                                     <td>{$formattedDateCreate}</td>
                                     <td>{$formattedDateDue}</td>
-                                    <td>{$row['Firma']}, {$row['Zusatz']}</td>
+                                    <td>{$row['Firma']} {$row['Zusatz']}</td>
                                     <td>{$row['PriorityText']}</td>
                                     <td>{$row['StatusText']}</td>                                                                                                             
                                     
@@ -278,13 +303,13 @@ if ($_SESSION['userid'] == "") {
         </form>
 
         <script>
-          $(document).ready(function () {
+            $(document).ready(function () {
                 let deleteId = null; // Speichert die ID für die Löschung
 
                 $('.delete-button').on('click', function (event) {
                     event.preventDefault();
                     deleteId = $(this).data('id'); // Hole die ID aus dem Button-Datenattribut
-                    alert(deleteId);
+                    // alert(deleteId);
                     $('#confirmDeleteModal').modal('show'); // Zeige das Modal an
                 });
 
@@ -332,7 +357,7 @@ if ($_SESSION['userid'] == "") {
                     pageLength: 10,
                     autoWidth: false,
                     columnDefs: [
-                        { type: 'date', targets: 7 } // Die Spalte mit `Datum`
+                        { type: 'date', targets: 3 } // "Datum" ist die vierte Spalte
                     ],
                     order: [[2, 'desc']], // Sortiere nach der zweiten Spalte (CreatedDate)
                     language: {

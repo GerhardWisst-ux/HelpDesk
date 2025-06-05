@@ -172,6 +172,7 @@ if ($_SESSION['userid'] == "") {
                                 <th>Firma</th>
                                 <th>Zusatz</th>
                                 <th>Straße</th>
+                                <th>PLZ</th>
                                 <th>Ort</th>
                                 <th>Telefon</th>
                                 <th>Mail</th>
@@ -188,6 +189,7 @@ if ($_SESSION['userid'] == "") {
                                     <td>{$row['Firma']}</td>
                                     <td>{$row['Zusatz']}</td>                                    
                                     <td>{$row['Street']}</td>
+                                    <td>{$row['ZIP']}</td>
                                     <td>{$row['Location']}</td>
                                     <td>{$row['Telefon']}</td>
                                     <td>{$row['Mail']}</td>
@@ -291,7 +293,7 @@ if ($_SESSION['userid'] == "") {
                     pageLength: 10,
                     autoWidth: false,
                     columnDefs: [{
-                        targets: 6,
+                        targets: 7,
                         className: "dt-body-nowrap" // Keine Zeilenumbrüche
                     }]
                 });
