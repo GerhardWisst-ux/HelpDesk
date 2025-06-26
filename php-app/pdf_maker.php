@@ -27,9 +27,10 @@ $stmt->execute();
 
 $inv_mst_data_row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-$HelpDesk_empfaenger = "Firma" . "\n" . $inv_mst_data_row['CUSTOMER_NAME'] . "\n"
-    . $inv_mst_data_row['STREET'] . "\n\n"
-    . $inv_mst_data_row['ADDRESS'];
+$HelpDesk_empfaenger = "Firma" . "\n" 
+    . trim($inv_mst_data_row['CUSTOMER_NAME']) . "\n"
+    . trim($inv_mst_data_row['STREET']) . "\n\n"
+    . ($inv_mst_data_row['ADDRESS']);
 
 $HelpDesk_empfaenger = "<b>" . htmlspecialchars($HelpDesk_empfaenger, ENT_QUOTES, 'UTF-8') . "</b>";
 
@@ -82,7 +83,7 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $html .= "
     <tr>        
         <td style='vertical-align: top; width: 250px;'>{$row['PRODUCT_NAME']}</td>
-        <td style='vertical-align: top; width: 150px; text-align:right;'>" . number_format($row['HOURS'], 0, '.', ',') . "</td>
+        <td style='vertical-align: top; width: 150px; text-align:right;'>" . number_format($row['HOURS'], 2, '.', ',') . "</td>
         <td style='vertical-align: top; width: 150px; text-align:right;'>" . number_format($row['NUMBER'], 2, '.', ',') . "</td>
         <td style='vertical-align: top; width: 125px; text-align:right;'>" . number_format($row['AMOUNT'], 2, '.', ',') . "</td>        
 		
@@ -115,7 +116,6 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 ";
 
 $html .= "</table>";
-
 
 $html .= nl2br($HelpDesk_footer);
 

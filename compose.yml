@@ -1,0 +1,34 @@
+services:
+  db: 
+    image: mariadb
+    environment:
+      - MARIADB_ROOT_PASSWORD=geheim
+      - MARIADB_DATABASE=helpdesk
+      - MARIADB_USER=helpdesk
+      - MARIADB_PASSWORD=geheimes-passwort
+    restart: on-failure:10
+    volumes: 
+      - db-vol:/var/lib/mysql
+      - ./db-init:/docker-entrypoint-initdb.d
+
+  pma: 
+    image: phpmyadmin
+    environment:
+      - PMA_HOST=db
+    ports:
+      - 6090:80
+    restart: on-failure:10
+    depends_on: 
+      - db
+
+  php:
+    build: ./php-app
+    volumes:
+      - ./php-app:/var/www/html
+    ports:
+      - 6091:80
+    depends_on:
+      - db
+volumes: 
+  db-vol:
+    name: db-vol-name5

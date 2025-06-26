@@ -73,9 +73,15 @@ if ($_SESSION['userid'] == "") {
             /* Grün für abgeschlossene Tickets */
         }
 
+        #TableTickets td:nth-child(0),
+        #TableTickets td:nth-child(1),
         #TableTickets td:nth-child(2),
-        /* Beschreibung */
-        #TableTickets td:nth-child(3) {
+        #TableTickets td:nth-child(3),
+        #TableTickets td:nth-child(4),
+        #TableTickets td:nth-child(5),
+        #TableTickets td:nth-child(6),
+        #TableTickets td:nth-child(7),
+        #TableTickets td:nth-child(8) {
             /* Bemerkung */
             max-width: 200px;
             /* Maximale Breite der Spalten */
@@ -120,6 +126,7 @@ if ($_SESSION['userid'] == "") {
                 /* Schriftgröße anpassen */
             }
 
+            #TableTickets td:nth-child(0),
             #TableTickets td:nth-child(1),
             #TableTickets td:nth-child(2),
             #TableTickets td:nth-child(3),
@@ -129,8 +136,20 @@ if ($_SESSION['userid'] == "") {
             #TableTickets td:nth-child(7),
             #TableTickets td:nth-child(8) {
                 display: table-cell;
-
             }
+
+            table#TableTickets td.dtr-control 
+            {
+                vertical-align: top !important;
+                /* Plus-Icon oben ausrichten */
+            }
+
+            table#TableTickets td.dtr-control:before 
+            {
+                vertical-align: top important;
+                /* Pseudo-Element des Icons */
+            }
+
 
         }
     </style>

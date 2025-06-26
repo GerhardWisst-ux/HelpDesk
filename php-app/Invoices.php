@@ -254,7 +254,7 @@ $userid = $_SESSION['userid'];
 		$('.delete-button').on('click', function (event) {
 			event.preventDefault();
 			deleteId = $(this).data('id'); // Hole die ID aus dem Button-Datenattribut
-			alert(deleteId);
+			// alert(deleteId);
 			$('#confirmDeleteModal').modal('show'); // Zeige das Modal an
 		});
 
