@@ -1,0 +1,9 @@
+Datum	IP	Seite	Browser
+15.08.2025 13:00:16	::1	/Helpdesk/php-app/ShowTickets.php?TicketID=1	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36
+15.08.2025 13:02:20	::1	/Helpdesk/php-app/ShowTickets.php?TicketID=1	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36
+15.08.2025 13:04:25	::1	/Helpdesk/php-app/ShowTickets.php?TicketID=1	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36
+15.08.2025 13:05:58	::1	/Helpdesk/php-app/ShowTickets.php?TicketID=1	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36
+15.08.2025 13:06:59	::1	/Helpdesk/php-app/ShowTickets.php?TicketID=1	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36
+15.08.2025 13:07:40	::1	/Helpdesk/php-app/ShowTickets.php?TicketID=1	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36
+15.08.2025 13:08:51	::1	/Helpdesk/php-app/ShowTickets.php?TicketID=1	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36
+15.08.2025 13:09:21	::1	/Helpdesk/php-app/ShowTickets.php?TicketID=1	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36

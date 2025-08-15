@@ -22,14 +22,15 @@
   $maxLength = 100;
   $alphanumericRegex = '/^[a-zA-Z0-9äöüÄÖÜß\s\-:.]+$/';
 
-  $zusatz = trim($_POST['zusatz']);
   $firma = trim($_POST['firma']);
-  $street = trim($_POST['street']);
+  $zusatz = trim($_POST['zusatz']);
+    $street = trim($_POST['street']);
   $location = trim($_POST['location']);
   $mail = trim($_POST['mail']);
   $internet = trim($_POST['internet']);
   $telefon = trim($_POST['telefon']);
   $fax = trim($_POST['fax']);
+  $priceperhour = trim($_POST['priceperhour']);
 
   // Validierung   
   if (strlen($firma) < $minLength) {
@@ -41,11 +42,9 @@
   if (!preg_match($alphanumericRegex, $firma)) {
     die("Fehler: Die Firma darf nur Buchstaben, Zahlen und Leerzeichen enthalten.");
   }
-
   if (!preg_match($alphanumericRegex, $zusatz)) {
     die("Fehler: Der Zusatz darf nur Buchstaben, Zahlen und Leerzeichen enthalten.");
   }
-
   if (strlen($street) < $minLength) {
     die("Fehler: Die Straße muss mindestens $minLength Zeichen lang sein.");
   }
@@ -55,7 +54,6 @@
   if (!preg_match($alphanumericRegex, $street)) {
     die("Fehler: Die Straße darf nur Buchstaben, Zahlen und Leerzeichen enthalten.");
   }
-
   if (strlen($location) < $minLength) {
     die("Fehler: Der Ort muss mindestens $minLength Zeichen lang sein.");
   }
@@ -93,11 +91,12 @@
     $fax = $_POST['fax'];
     $internet = $_POST['internet'];
     $zip = $_POST['zip'];
+    $zip = $_POST['zip'];
     $countryID = 1;
 
-    $sql = "INSERT INTO customer (zusatz, firma, street, zip, telefon, fax, internet,location, mail, countryid ) VALUES (:zusatz, :firma, :street, :zip, :telefon, :fax , :internet, :location, :mail, :countryid)";
+    $sql = "INSERT INTO customer (zusatz, firma, street, zip, telefon, fax, internet,location, mail, countryid,priceperhour) VALUES (:zusatz, :firma, :street, :zip, :telefon, :fax , :internet, :location, :mail, :countryid, :priceperhour)";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['zusatz' => $zusatz, 'firma' => $firma, 'street' => $street, 'telefon' => $telefon, 'fax' => $fax, 'internet' => $internet, 'zip' => $zip, 'location' => $location, 'mail' => $mail, 'countryid' => $countryID]);
+    $stmt->execute(['zusatz' => $zusatz, 'firma' => $firma, 'street' => $street, 'telefon' => $telefon, 'fax' => $fax, 'internet' => $internet, 'zip' => $zip, 'location' => $location, 'mail' => $mail, 'countryid' => $countryID, 'priceperhour' => $priceperhour]);
 
     echo "Kunde hinzugefügt!";
     sleep(3);

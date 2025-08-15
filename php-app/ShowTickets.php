@@ -20,78 +20,111 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.dataTables.min.css">
 
-  <!-- JS -->
-  <script src="js/jquery.min.js"></script>
-  <script src="js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-  <script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
   <style>
-    /* Allgemeine Einstellungen */
+    /* === Grundlayout === */
+    html,
     body {
-      font-family: 'Arial', sans-serif;
-      background-color: #f4f7f6;
+      height: 100%;
       margin: 0;
-      padding: 0;
-    }
-
-    label {
-      font-size: 14px;
-      font-weight: 600;
-      color: #333;
-    }
-
-    /* Tabelle Margins */
-    .custom-container table,
-    .dataTables_info {
-      margin-left: 1.2rem !important;
-      margin-right: 1.2rem !important;
-      width: 98%;
-    }
-
-    .me-4 {
-      margin-left: 1.2rem !important;
-    }
-
-    .me-2 {
-      margin-left: 0.6rem !important;
-    }
-
-    .betrag-right {
-      text-align: right;
+      background-color: #dedfe0ff;
+      /* hellgrau statt reinweiß */
     }
 
 
-
-    .form-label {
-      min-width: 25%;
-      /* Einheitliche Breite für Labels */
-      width: 25%;
-      /* Einheitliche Breite für Labels */
-      vertical-align: top;
+    /* Wrapper nimmt die volle Höhe ein und ist Flex-Container */
+    .wrapper {
+      min-height: 100vh;
+      /* viewport height */
+      display: flex;
+      flex-direction: column;
     }
 
-    #TicketDetail td,
-    #TicketDetail th {
-      white-space: nowrap;
-      font-size: 12px;
-      /* Schriftgröße anpassen */
+    /* Container oder Content-Bereich wächst flexibel */
+    .container {
+      flex: 1;
+      /* nimmt den verfügbaren Platz ein */
     }
 
-    #TicketDetail td:nth-child(1),
-    #TicketDetail td:nth-child(2),
-    #TicketDetail td:nth-child(3),
-    #TicketDetail th:nth-child(4),
-    #TicketDetail th:nth-child(5),
-    #TicketDetail th:nth-child(6) {
-      display: table-cell;
-      /* Sicherstellen, dass Dauerbuchung sichtbar bleibt */
+    /* Footer bleibt unten */
+    footer {
+      /* kein spezielles CSS nötig, wenn wrapper und container wie oben */
     }
 
-    @media screen and (max-width: 767px) {
-      .visible-column {
-        display: none;
-        ;
-      }
+    /* === Karten-Design mit Schatten === */
+    .card {
+      font-size: 0.9rem;
+      background-color: #ffffff;
+      border: 1px solid #dee2e6;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      /* leichter Schatten */
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .card:hover {
+      transform: scale(1.01);
+      /* kleine Hover-Interaktion */
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+    }
+
+    .card-body p {
+      margin-bottom: 0.5rem;
+    }
+
+    .card-img-top {
+      height: 200px;
+      /* Einheitliche Höhe */
+      object-fit: cover;
+      /* Bild wird beschnitten, nicht verzerrt */
+    }
+
+    /* === Navbar Design === */
+    .navbar-custom {
+      background: linear-gradient(to right, #cce5f6, #e6f2fb);
+      border-bottom: 1px solid #b3d7f2;
+    }
+
+    .navbar-custom .navbar-brand,
+    .navbar-custom .nav-link {
+      color: #0c2c4a;
+      font-weight: 500;
+    }
+
+    .navbar-custom .nav-link:hover,
+    .navbar-custom .nav-link:focus {
+      color: #04588c;
+      text-decoration: underline;
+    }
+
+    .custom-header {
+      background: linear-gradient(to right, #2a55e0ff, #4670e4ff);
+      /* dunkles, klassisches Grün */
+      border-bottom: 2px solid #0666f7ff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      border-radius: 0 0 1rem 1rem;
+    }
+
+    .btn-darkgreen {
+      background-color: #0d3dc2ff;
+      border-color: #145214;
+      color: #fff;
+    }
+
+    .btn-darkgreen:hover {
+      background-color: #0337e4ff;
+      ;
+      border-color: #2146beff;
+    }
+
+    .btn {
+      border-radius: 50rem;
+      /* pill-shape */
+      font-size: 0.9rem;
+      padding: 0.375rem 0.75rem;
+      font-size: 0.85rem;
     }
   </style>
 </head>
@@ -109,62 +142,40 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
   $userid = $_SESSION['userid'];
 
   $TicketID = $_GET['TicketID'];
-  $_SESSION['TicketID']  = $_GET['TicketID'];
-  
-  ?>
+  $_SESSION['TicketID'] = $_GET['TicketID'];
 
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="TicketUebersicht.php"><i class="fa-solid fa-house"></i></a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
-        aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNavDropdown">
-        <ul class="navbar-nav">
-          <li class="nav-item">
-            <a href="TicketUebersicht.php" class="nav-link">Tickets</a>
-          </li>
-          <li class="nav-item">
-            <a href="Customer.php" class="nav-link">Kunden</a>
-          </li>
-          <li class="nav-item">
-            <a href="Invoices.php" class="nav-link">Rechnungen</a>
-          </li>
-          <li class="nav-item">
-            <a href="Prioritaeten.php" class="nav-link">Prioritäten</a>
-          </li>
-          <li class="nav-item">
-            <a href="Stati.php" class="nav-link">Stati</a>
-          </li>
-          <li class="nav-item">
-            <a href="Impressum.php" class="nav-link">Impressum</a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
+  require_once 'includes/header.php';
+  ?>
 
 
   <form id="bestaendeform">
-    <div class="custom-container">
-      <div class="mt-0 p-5 bg-secondary text-white text-center rounded-bottom">
-        <h1>Helpdesk</h1>
-        <p>Hauptseite</p>
-      </div>
+    <header class="custom-header py-2 text-white">
+      <div class="container-fluid">
+        <div class="row align-items-center">
 
-      <div class="container-fluid mt-3">
-        <div class="row">
-          <div class="col-12 text-end">
-            <?php echo "<span>Angemeldet als: " . htmlspecialchars($email) . "</span>"; ?>
-            <a class="btn btn-primary" title="Abmelden vo Helpdesk" href="logout.php">
-              <i class="fa fa-sign-out" aria-hidden="true"></i>
+          <!-- Titel zentriert -->
+          <div class="col-12 text-center mb-2 mb-md-0">
+            <h2 class="h4 mb-0">Helpdesk - Anzeigen Tickets</h2>
+          </div>
+
+          <!-- Benutzerinfo + Logout -->
+          <div class="col-12 col-md-auto ms-md-auto text-center text-md-end">
+            <!-- Auf kleinen Bildschirmen: eigene Zeile für E-Mail -->
+            <div class="d-block d-md-inline mb-1 mb-md-0">
+              <span class="me-2">Angemeldet als: <?= htmlspecialchars($_SESSION['email']) ?></span>
+            </div>
+            <!-- Logout-Button -->
+            <a class="btn btn-darkgreen btn-sm" title="Abmelden vom Webshop" href="logout.php">
+              <i class="fa fa-sign-out" aria-hidden="true"></i> Ausloggen
             </a>
           </div>
         </div>
       </div>
+    </header>
+    <br>
+    <div class="mx-2">
       <?php
-      echo '<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">';
+      echo '<div class="btn-toolbar mx-2" role="toolbar" aria-label="Toolbar with button groups">';
       echo '<div class="btn-group" role="group" aria-label="First group">';
       echo '<a href="AddTicket.php" title="Eintrag hinzufügen" class="btn btn-primary btn-sm me-4"><span><i class="fa fa-plus" aria-hidden="true"></i></span></a>';
       echo '</div>';
@@ -182,7 +193,7 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
       echo '<form method="GET" action="" style="display: flex; flex-direction: column; gap: 10px;">';
 
       // Erste Zeile: Labels
-      echo '<div id="divLabels" style="display: flex; justify-content: space-between; width: 30%;">';
+      echo '<div id="divLabels" class="mx-2" style="display: flex; justify-content: space-between; width: 30%;">';
       echo '<label for="monat" class="label me-4" style="width: 50%; text-align: left;">Tickets im Monat:</label>';
       echo '</div>';
 
@@ -270,19 +281,19 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
 
 
         echo "
-    <div class='row me-2'>
+    <div class='row mx-2'>
         <!-- Spalte 1 -->
         <div class='col-md-6'>
             <div class='d-flex align-items-center mb-1'>
-                <label for='TicketID' class='form-label me-2'>TicketID</label>
+                <label for='TicketID' class='col-sm-2 col-form-label text-dark'>TicketID</label>
                 <input style='text-align:right; width:150px;' type='text' class='form-control' value='" . htmlspecialchars($TicketID) . "' id='TicketID'>
             </div>
             <div class='d-flex align-items-center mb-1'>
-                <label for='Description' class='form-label me-2'>Beschreibung</label>
+                <label for='Description' class='col-sm-2 col-form-label text-dark'>Beschreibung</label>
                 <textarea class='form-control' style='width:80%;' id='Notes' rows='2'>" . htmlspecialchars($row['Description']) . "</textarea>
             </div>
             <div class='d-flex align-items-start mb-1'>
-                <label for='Notes' class='form-label me-2' style='align-self: flex-start;'>Bemerkung</label>
+                <label for='Notes' class='col-sm-2 col-form-label text-dark' style='align-self: flex-start;'>Bemerkung</label>
                 <textarea class='form-control' style='width:80%;' id='Notes' rows='6'>" . htmlspecialchars($row['Notes']) . "</textarea>
             </div>
         </div>
@@ -290,7 +301,7 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
         <!-- Spalte 2 -->
         <div class='col-md-6'>
             <div class='d-flex align-items-center mb-1'>
-                <label for='CustomerID' class='form-label me-2'>Kunde</label>
+                <label for='CustomerID' class='col-sm-2 col-form-label text-dark'>Kunde</label>
                 <select class='form-control' id='status-dropdown' onchange='toggleCustomInput(this)' name='CustomerID'>
             ";
 
@@ -312,19 +323,19 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
            </div>
 
             <div class='d-flex align-items-center mb-1'>
-                <label for='CreatedDate' class='form-label me-2'>Datum</label>
+                <label for='CreatedDate' class='col-sm-2 col-form-label text-dark'>Datum</label>
                 <input style='width:150px;' type='date' class='form-control' value='" . htmlspecialchars($formattedDateCreate) . "' required>
             </div>
             <div class='d-flex align-items-center mb-1'>
-                <label for='DueDate' class='form-label me-2'>Zu erledigen Bis</label>
+                <label for='DueDate' class='col-sm-2 col-form-label text-dark'>Zu erledigen Bis</label>
                 <input style='width:150px;' type='date' class='form-control' value='" . htmlspecialchars($formattedDateDue) . "' required>
             </div>
             <div class='d-flex align-items-center mb-1'>
-                <label for='ClosedDate' class='form-label me-2'>Geschlossen</label>
+                <label for='ClosedDate' class='col-sm-2 col-form-label text-dark'>Geschlossen</label>
                 <input style='width:150px;' type='date' class='form-control' id='ClosedDate' value='" . htmlspecialchars($formattedDateClosed) . "' required>
             </div>
                                     <div class='d-flex align-items-center mb-1'>
-                            <label for='StatusID' class='form-label me-2'>Status</label>
+                            <label for='StatusID' class='col-sm-2 col-form-label text-dark'>Status</label>
                             <select class='form-control' style='width:150px;' id='status-dropdown' onchange='toggleCustomInput(this)' name='StatusID'>
             ";
 
@@ -347,7 +358,7 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
                 </select>
             </div>
             <div class='d-flex align-items-center mb-1'>
-                <label for='PriorityID' class='form-label me-2'>Priorität</label>
+                <label for='PriorityID' class='col-sm-2 col-form-label text-dark'>Priorität</label>
                 <select class='form-control' style='width:150px;' id='priority-dropdown' onchange='toggleCustomInput(this)' name='PriorityID'>
             ";
 
@@ -476,6 +487,7 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
 
       ?>
     </div>
+    
     <!-- Bootstrap Modal -->
     <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel"
       aria-hidden="true">
@@ -508,6 +520,12 @@ if (!isset($_SESSION['userid']) || $_SESSION['userid'] == "") {
       </div>
     </div>
   </form>
+
+  <!-- JS -->
+  <script src="js/jquery.min.js"></script>
+  <script src="js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
 
   <script>
     $(document).ready(function () {

@@ -3,6 +3,7 @@
 
 <?php
 ob_start();
+
 session_start();
 if ($_SESSION['userid'] == "") {
     header('Location: Login.php'); // zum Loginformular
@@ -20,81 +21,112 @@ if ($_SESSION['userid'] == "") {
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.dataTables.min.css">
 
-    <!-- JS -->
-    <script src="js/jquery.min.js"></script>
-    <script src="js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
+
     <style>
-        /* Allgemeine Einstellungen */
+        /* === Grundlayout === */
+        html,
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f7f6;
+            height: 100%;
             margin: 0;
-            padding: 0;
+            background-color: #dedfe0ff;
+            /* hellgrau statt reinweiß */
         }
 
 
-        label {
-            font-size: 14px;
-            font-weight: 600;
-            color: #333;
+        /* Wrapper nimmt die volle Höhe ein und ist Flex-Container */
+        .wrapper {
+            min-height: 100vh;
+            /* viewport height */
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Tabelle Margins */
-        .custom-container table {
-            margin-left: 1.2rem !important;
-            margin-right: 1.2rem !important;
-            width: 98%;
+        /* Container oder Content-Bereich wächst flexibel */
+        .container {
+            flex: 1;
+            /* nimmt den verfügbaren Platz ein */
         }
 
-        .dataTables_wrapper .dataTables_length select,
-        .dataTables_wrapper .dataTables_filter, #TableKunden_info {
-            margin-left: 1.2rem !important;
-            margin-right: 0.8rem !important;
+        /* Footer bleibt unten */
+        footer {
+            /* kein spezielles CSS nötig, wenn wrapper und container wie oben */
         }
 
-        .me-4 {
-            margin-left: 1.2rem !important;
+        /* === Karten-Design mit Schatten === */
+        .card {
+            font-size: 0.9rem;
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            /* leichter Schatten */
+            transition: transform 0.2s ease-in-out;
         }
 
-        .betrag-right {
-            text-align: right;
+        .card:hover {
+            transform: scale(1.01);
+            /* kleine Hover-Interaktion */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
 
-        /* Spaltenbreiten optimieren */
-        @media screen and (max-width: 767px) {
+        .card-title {
+            font-size: 1.1rem;
+        }
 
-            .custom-container table {
-                margin-left: 0.2rem !important;
-                margin-right: 0.2rem !important;
-                width: 98%;
-            }
+        .card-body p {
+            margin-bottom: 0.5rem;
+        }
 
-            .me-4 {
-                margin-left: 0.2rem !important;
-            }
+        .card-img-top {
+            height: 200px;
+            /* Einheitliche Höhe */
+            object-fit: cover;
+            /* Bild wird beschnitten, nicht verzerrt */
+        }
 
-            .dataTables_wrapper .dataTables_length select,
-            .dataTables_wrapper .dataTables_filter {
-                margin-left: 0.2rem !important;
+        /* === Navbar Design === */
+        .navbar-custom {
+            background: linear-gradient(to right, #cce5f6, #e6f2fb);
+            border-bottom: 1px solid #b3d7f2;
+        }
 
-            }
+        .navbar-custom .navbar-brand,
+        .navbar-custom .nav-link {
+            color: #0c2c4a;
+            font-weight: 500;
+        }
 
-            #TableKunden td,
-            #TableKunden th {
-                white-space: nowrap;
-                font-size: 12px;
-                /* Schriftgröße anpassen */
-            }
+        .navbar-custom .nav-link:hover,
+        .navbar-custom .nav-link:focus {
+            color: #04588c;
+            text-decoration: underline;
+        }
 
-            #TableKunden td:nth-child(1),
-            #TableKunden td:nth-child(2),
-            #TableKunden td:nth-child(3),
-            #TableKunden th:nth-child(4) {
-                display: table-cell;
-                /* Sicherstellen, dass Dauerbuchung sichtbar bleibt */
-            }
+        .custom-header {
+            background: linear-gradient(to right, #2a55e0ff, #4670e4ff);
+            /* dunkles, klassisches Grün */
+            border-bottom: 2px solid #0666f7ff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 1rem 1rem;
+        }
+
+        .btn-darkgreen {
+            background-color: #0d3dc2ff;
+            border-color: #145214;
+            color: #fff;
+        }
+
+        .btn-darkgreen:hover {
+            background-color: #0337e4ff;
+            ;
+            border-color: #2146beff;
+        }
+
+        .btn {
+            border-radius: 50rem;
+            /* pill-shape */
+            font-size: 0.9rem;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.85rem;
         }
     </style>
 </head>
@@ -105,87 +137,66 @@ if ($_SESSION['userid'] == "") {
 
     require 'db.php';
     $email = $_SESSION['email'];
-    $userid = $_SESSION['userid'];
+
+    require_once 'includes/header.php';
     ?>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="TicketUebersicht.php"><i class="fa-solid fa-house"></i></a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
-                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNavDropdown">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a href="TicketUebersicht.php" class="nav-link">Tickets</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="Customer.php" class="nav-link">Kunden</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="Prioritaeten.php" class="nav-link">Prioritäten</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="Stati.php" class="nav-link">Stati</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="Impressum.php" class="nav-link">Impressum</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <div id="stati">
+        <form id="staiform">
+            <header class="custom-header py-2 text-white">
+                <div class="container-fluid">
+                    <div class="row align-items-center">
 
-    <div id="bestaende">
-        <form id="bestaendeform">
-            <div class="custom-container">
-                <div class="mt-0 p-5 bg-secondary text-white text-center rounded-bottom">
-                    <h1>HelpDesk</h1>
-                    <p>Kunden</p>
-                </div>
+                        <!-- Titel zentriert -->
+                        <div class="col-12 text-center mb-2 mb-md-0">
+                            <h2 class="h4 mb-0">Helpdesk - Kunden</h2>
+                        </div>
 
-                <div class="container-fluid mt-3">
-                    <div class="row">
-                        <div class="col-12 text-end">
-                            <?php echo "<span>Angemeldet als: " . htmlspecialchars($email) . "</span>"; ?>
-                            <a class="btn btn-primary" title="Abmelden von HelpDesk" href="logout.php">
-                                <i class="fa fa-sign-out" aria-hidden="true"></i>
+                        <!-- Benutzerinfo + Logout -->
+                        <div class="col-12 col-md-auto ms-md-auto text-center text-md-end">
+                            <!-- Auf kleinen Bildschirmen: eigene Zeile für E-Mail -->
+                            <div class="d-block d-md-inline mb-1 mb-md-0">
+                                <span class="me-2">Angemeldet als: <?= htmlspecialchars($_SESSION['email']) ?></span>
+                            </div>
+                            <!-- Logout-Button -->
+                            <a class="btn btn-darkgreen btn-sm" title="Abmelden vom Webshop" href="logout.php">
+                                <i class="fa fa-sign-out" aria-hidden="true"></i> Ausloggen
                             </a>
                         </div>
                     </div>
                 </div>
-                <?php
+            </header>
+            <?php
 
-                echo '<div class="btn-toolbar me-4" role="toolbar" aria-label="Toolbar with button groups" style="gap: 0.5rem;">'; // Reduziert den Abstand zwischen Gruppen
-                echo '<div class="btn-group" role="group" aria-label="First group">';
-                echo '<a href="AddCustomer.php" title="Kunde hinzufügen" class="btn btn-primary btn-sm"><span><i class="fa fa-plus" aria-hidden="true"></i></span></a>';
-                echo '</div>';
-                echo '</div><br>';
-              
-                ?>
-                <br>
-                <div class="custom-container">
-                    <table id="TableKunden" class="display nowrap">
-                        <thead>
-                            <tr>
-                                <th>Firma</th>
-                                <th>Zusatz</th>
-                                <th>Straße</th>
-                                <th>PLZ</th>
-                                <th>Ort</th>
-                                <th>Telefon</th>
-                                <th>Mail</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            $sql = "SELECT * FROM customer";
-                            $stmt = $pdo->prepare($sql);
-                            $stmt->execute();
-                            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            echo '<div class="btn-toolbar me-4 mx-2 mt-2" role="toolbar" aria-label="Toolbar with button groups" style="gap: 0.5rem;">'; // Reduziert den Abstand zwischen Gruppen
+            echo '<div class="btn-group" role="group" aria-label="First group">';
+            echo '<a href="AddCustomer.php" title="Kunde hinzufügen" class="btn btn-primary btn-sm"><span><i class="fa fa-plus" aria-hidden="true"></i></span></a>';
+            echo '</div>';
+            echo '</div><br>';
 
-                                echo "<tr>
+            ?>
+            <br>
+            <div class="custom-container mx-2">
+                <table id="TableKunden" class="display nowrap">
+                    <thead>
+                        <tr>
+                            <th>Firma</th>
+                            <th>Zusatz</th>
+                            <th>Straße</th>
+                            <th>PLZ</th>
+                            <th>Ort</th>
+                            <th>Telefon</th>
+                            <th>Mail</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $sql = "SELECT * FROM customer";
+                        $stmt = $pdo->prepare($sql);
+                        $stmt->execute();
+                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+
+                            echo "<tr>
                                     <td>{$row['Firma']}</td>
                                     <td>{$row['Zusatz']}</td>                                    
                                     <td>{$row['Street']}</td>
@@ -200,49 +211,53 @@ if ($_SESSION['userid'] == "") {
                                     </td>
                                     
                                 </tr>";
-                            }
-                            ?>
-                        </tbody>
-                    </table>
-                </div>
-                <!-- Bootstrap Modal -->
-                <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel"
-                    aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="confirmDeleteModalLabel">Löschbestätigung</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Schließen"></button>
-                            </div>
-                            <div class="modal-body">
-                                Möchten Sie diesen Kunden wirklich löschen?
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary"
-                                    data-bs-dismiss="modal">Abbrechen</button>
-                                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Löschen</button>
-                            </div>
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Bootstrap Modal -->
+            <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="confirmDeleteModalLabel">Löschbestätigung</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Schließen"></button>
+                        </div>
+                        <div class="modal-body">
+                            Möchten Sie diesen Kunden wirklich löschen?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                            <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Löschen</button>
                         </div>
                     </div>
                 </div>
-                <!-- Toast -->
-                <div class="toast-container position-fixed top-0 end-0 p-3">
-                    <div id="deleteToast" class="toast toast-green" role="alert" aria-live="assertive"
-                        aria-atomic="true">
-                        <div class="toast-header">
-                            <strong class="me-auto">Benachrichtigung</strong>
-                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                        </div>
-                        <div class="toast-body">
-                            Kunde wurde gelöscht.
-                        </div>
+            </div>
+            <!-- Toast -->
+            <div class="toast-container position-fixed top-0 end-0 p-3">
+                <div id="deleteToast" class="toast toast-green" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header">
+                        <strong class="me-auto">Benachrichtigung</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        Kunde wurde gelöscht.
                     </div>
                 </div>
+            </div>
         </form>
 
+        <!-- JS -->
+        <script src="js/jquery.min.js"></script>
+        <script src="js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
+
         <script>
-             $(document).ready(function () {
+            $(document).ready(function () {
                 let deleteId = null; // Speichert die ID für die Löschung
 
                 $('.delete-button').on('click', function (event) {

@@ -25,121 +25,110 @@ if ($_SESSION['userid'] == "") {
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
     <style>
-        /* Allgemeine Einstellungen */
+        /* === Grundlayout === */
+        html,
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f7f6;
+            height: 100%;
             margin: 0;
-            padding: 0;
+            background-color: #dedfe0ff;
+            /* hellgrau statt reinweiß */
         }
 
-        .topnav {
-            background-color: #2d3436;
-            overflow: hidden;
+
+        /* Wrapper nimmt die volle Höhe ein und ist Flex-Container */
+        .wrapper {
+            min-height: 100vh;
+            /* viewport height */
             display: flex;
-            padding: 10px 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            flex-direction: column;
         }
 
-        .topnav a {
+        /* Container oder Content-Bereich wächst flexibel */
+        .container {
+            flex: 1;
+            /* nimmt den verfügbaren Platz ein */
+        }
+
+        /* Footer bleibt unten */
+        footer {
+            /* kein spezielles CSS nötig, wenn wrapper und container wie oben */
+        }
+
+        /* === Karten-Design mit Schatten === */
+        .card {
+            font-size: 0.9rem;
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            /* leichter Schatten */
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .card:hover {
+            transform: scale(1.01);
+            /* kleine Hover-Interaktion */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+        }
+
+        .card-body p {
+            margin-bottom: 0.5rem;
+        }
+
+        .card-img-top {
+            height: 200px;
+            /* Einheitliche Höhe */
+            object-fit: cover;
+            /* Bild wird beschnitten, nicht verzerrt */
+        }
+
+        /* === Navbar Design === */
+        .navbar-custom {
+            background: linear-gradient(to right, #cce5f6, #e6f2fb);
+            border-bottom: 1px solid #b3d7f2;
+        }
+
+        .navbar-custom .navbar-brand,
+        .navbar-custom .nav-link {
+            color: #0c2c4a;
+            font-weight: 500;
+        }
+
+        .navbar-custom .nav-link:hover,
+        .navbar-custom .nav-link:focus {
+            color: #04588c;
+            text-decoration: underline;
+        }
+
+        .custom-header {
+            background: linear-gradient(to right, #2a55e0ff, #4670e4ff);
+            /* dunkles, klassisches Grün */
+            border-bottom: 2px solid #0666f7ff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 1rem 1rem;
+        }
+
+        .btn-darkgreen {
+            background-color: #0d3dc2ff;
+            border-color: #145214;
             color: #fff;
-            text-decoration: none;
-            padding: 10px 15px;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
         }
 
-        .topnav a:hover {
-            background-color: rgb(161, 172, 169);
-            color: #2d3436;
+        .btn-darkgreen:hover {
+            background-color: #0337e4ff;
+            ;
+            border-color: #2146beff;
         }
 
-        .topnav .icon {
-            display: none;
-        }
-
-        label {
-            font-size: 14px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        /* Tabelle Margins */
-        .custom-container table {
-            margin-left: 1.2rem !important;
-            margin-right: 1.2rem !important;
-            width: 98%;
-        }
-
-        .me-4 {
-            margin-left: 1.2rem !important;
-        }
-
-        /* Spaltenbreiten optimieren */
-        @media screen and (max-width: 767px) {
-
-            .custom-container table {
-                margin-left: 0.2rem !important;
-                margin-right: 0.2rem !important;
-                width: 98%;
-            }
-
-            .me-4 {
-                margin-left: 0.2rem !important;
-            }
-
-
-            .topnav a:not(:first-child) {
-                display: none;
-            }
-
-            .topnav a.icon {
-                display: block;
-                font-size: 30px;
-            }
-
-            .topnav.responsive {
-                position: relative;
-            }
-
-            .topnav.responsive .icon {
-                position: absolute;
-                right: 0;
-                top: 0;
-            }
-
-            .topnav.responsive a {
-                display: block;
-                text-align: left;
-            }
-        }
-
-        /* Responsive Design */
-        @media screen and (max-width: 600px) {
-            .topnav a:not(:first-child) {
-                display: none;
-            }
-
-            .topnav a.icon {
-                display: block;
-                font-size: 30px;
-            }
-
-            .topnav.responsive {
-                position: relative;
-            }
-
-            .topnav.responsive .icon {
-                position: absolute;
-                right: 0;
-                top: 0;
-            }
-
-            .topnav.responsive a {
-                display: block;
-                text-align: left;
-            }
-
+        .btn {
+            border-radius: 50rem;
+            /* pill-shape */
+            font-size: 0.9rem;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.85rem;
         }
     </style>
 </head>
@@ -165,137 +154,125 @@ if ($_SESSION['userid'] == "") {
 
     $email = $_SESSION['email'];
     $userid = $_SESSION['userid'];
+
+    require_once 'includes/header.php';
     ?>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="TicketUebersicht.php"><i class="fa-solid fa-house"></i></a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
-                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNavDropdown">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a href="TicketUebersicht.php" class="nav-link">Tickets</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="Customer.php" class="nav-link">Kunden</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="Prioritaeten.php" class="nav-link">Prioritäten</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="Stati.php" class="nav-link">Stati</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="Impressum.php" class="nav-link">Impressum</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+
 
 
     <div id="addCustomer">
         <form action="AddCustomerEntry.php" method="post">
-            <div class="custom-container">
-                <div class="mt-0 p-5 bg-secondary text-white text-center rounded-bottom">
-                    <h1>HelpDesk</h1>
-                    <p>Kunde hinzufügen</p>
-                </div>
+            <header class="custom-header py-2 text-white">
+                <div class="container-fluid">
+                    <div class="row align-items-center">
 
-                <div class="container-fluid mt-3">
-                    <div class="row">
-                        <div class="col-12 text-end">
-                            <?php echo "<span>Angemeldet als: " . htmlspecialchars($email) . "</span>"; ?>
-                            <a class="btn btn-primary" title="Abmelden vomn HelpDesk" href="logout.php">
-                                <i class="fa fa-sign-out" aria-hidden="true"></i>
+                        <!-- Titel zentriert -->
+                        <div class="col-12 text-center mb-2 mb-md-0">
+                            <h2 class="h4 mb-0">Helpdesk - Kunde hinzufügen</h2>
+                        </div>
+
+                        <!-- Benutzerinfo + Logout -->
+                        <div class="col-12 col-md-auto ms-md-auto text-center text-md-end">
+                            <!-- Auf kleinen Bildschirmen: eigene Zeile für E-Mail -->
+                            <div class="d-block d-md-inline mb-1 mb-md-0">
+                                <span class="me-2">Angemeldet als: <?= htmlspecialchars($_SESSION['email']) ?></span>
+                            </div>
+                            <!-- Logout-Button -->
+                            <a class="btn btn-darkgreen btn-sm" title="Abmelden vom Webshop" href="logout.php">
+                                <i class="fa fa-sign-out" aria-hidden="true"></i> Ausloggen
                             </a>
                         </div>
                     </div>
                 </div>
-                <br>
-            </div>
+            </header>
             <br>
-            <div class="form-group row me-4">
-                <label class="col-sm-2 col-form-label text-dark">Firma:</label>
-                <div class="col-sm-10">
+            <div class="mx-2">
+                <div class="form-group row me-4">
+                    <label class="col-sm-2 col-form-label text-dark">Firma:</label>
                     <div class="col-sm-10">
                         <input class="form-control" type="text" id="firma" name="firma" required>
                         <small id="firmaError" class="text-danger"></small>
                     </div>
                 </div>
-            </div>
-            <div class="form-group row me-4">
-                <label class="col-sm-2 col-form-label text-dark">Zusatz:</label>
-                <div class="col-sm-10">
-                    <input class="form-control" type="text" id="zusatz" name="zusatz">
-                    <small id="zusatzError" class="text-danger"></small>
+                <div class="form-group row me-4">
+                    <label class="col-sm-2 col-form-label text-dark">Zusatz:</label>
+                    <div class="col-sm-10">
+                        <input class="form-control" type="text" id="zusatz" name="zusatz">
+                        <small id="zusatzError" class="text-danger"></small>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group row me-4">
-                <label class="col-sm-2 col-form-label text-dark">Straße:</label>
-                <div class="col-sm-10">
-                    <input id="street" class="form-control" type="text" name="street">
-                    <small id="streetError" class="text-danger"></small>
+                <div class="form-group row me-4">
+                    <label class="col-sm-2 col-form-label text-dark">Straße:</label>
+                    <div class="col-sm-10">
+                        <input id="street" class="form-control" type="text" name="street">
+                        <small id="streetError" class="text-danger"></small>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group row me-4">
-                <label class="col-sm-2 col-form-label text-dark">ZIP:</label>
-                <div class="col-sm-10">
-                    <input id="zip" class="form-control" type="number" name="zip">
-                    <small id="zipError" class="text-danger"></small>
+                <div class="form-group row me-4">
+                    <label class="col-sm-2 col-form-label text-dark">ZIP:</label>
+                    <div class="col-sm-1">
+                        <input id="zip" class="form-control" type="number" name="zip">
+                        <small id="zipError" class="text-danger"></small>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group row me-4">
-                <label class="col-sm-2 col-form-label text-dark">Ort:</label>
-                <div class="col-sm-10">
-                    <input id="location" class="form-control" type="text" name="location">
-                    <small id="locationError" class="text-danger"></small>
+                <div class="form-group row me-4">
+                    <label class="col-sm-2 col-form-label text-dark">Ort:</label>
+                    <div class="col-sm-10">
+                        <input id="location" class="form-control" type="text" name="location" required>
+                        <small id="locationError" class="text-danger"></small>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group row me-4">
-                <label class="col-sm-2 col-form-label text-dark">Telefon:</label>
-                <div class="col-sm-3">
-                    <input id="telefon" class="form-control" type="text" name="telefon">
-                    <small id="telefonError" class="text-danger"></small>
+                <div class="form-group row me-4">
+                    <label class="col-sm-2 col-form-label text-dark">Telefon:</label>
+                    <div class="col-sm-2">
+                        <input id="telefon" class="form-control" type="text" name="telefon">
+                        <small id="telefonError" class="text-danger"></small>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group row me-4">
-                <label class="col-sm-2 col-form-label text-dark">Fax:</label>
-                <div class="col-sm-3">
-                    <input id="fax" class="form-control" type="text" name="fax">
-                    <small id="faxError" class="text-danger"></small>
+                <div class="form-group row me-4">
+                    <label class="col-sm-2 col-form-label text-dark">Fax:</label>
+                    <div class="col-sm-2">
+                        <input id="fax" class="form-control" type="text" name="fax">
+                        <small id="faxError" class="text-danger"></small>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group row me-4">
-                <label class="col-sm-2 col-form-label text-dark">Mail:</label>
-                <div class="col-sm-3">
-                    <input id="mail" class="form-control" type="text" name="mail">
-                    <small id="mailError" class="text-danger"></small>
+                <div class="form-group row me-4">
+                    <label class="col-sm-2 col-form-label text-dark">Mail:</label>
+                    <div class="col-sm-2">
+                        <input id="mail" class="form-control" type="text" name="mail" required>
+                        <small id="mailError" class="text-danger"></small>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group row me-4">
-                <label class="col-sm-2 col-form-label text-dark">Internet:</label>
-                <div class="col-sm-10">
-                    <input id="internet" class="form-control" type="text" name="internet">
-                    <small id="internetError" class="text-danger"></small>
+                <div class="form-group row me-4">
+                    <label class="col-sm-2 col-form-label text-dark">Internet:</label>
+                    <div class="col-sm-10">
+                        <input id="internet" class="form-control" type="text" name="internet">
+                        <small id="internetError" class="text-danger"></small>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group row me-4">
-                <label class="col-sm-2 col-form-label text-dark">Kunde seit:</label>
-                <div class="col-sm-1">
-                    <input id="kundeseit" class="form-control" type="date" name="kundeseit">
-                    <small id="kundeseitError" class="text-danger"></small>
+                <div class="form-group row me-4">
+                    <label class="col-sm-2 col-form-label text-dark">Kunde seit:</label>
+                    <div class="col-sm-1">
+                        <input id="kundeseit" class="form-control" type="date" name="kundeseit">
+                        <small id="kundeseitError" class="text-danger"></small>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group row me-4">
-                <div class="col-sm-offset-2 col-sm-100">
-                    <button class="btn btn-primary" title="Fügt Kunden hinzu" type="submit"><i
-                            class="fas fa-save"></i></button>
-                    <a href="Customer.php" title="Zurück zur Kundenübersicht" class="btn btn-primary"><i
-                            class="fa fa-arrow-left" aria-hidden="true"></i></a>
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label text-dark">Stundensatz:</label>
+                    <div class="col-sm-1">
+                        <input id="priceperhour" min="0" max="500" step="0.01" class="form-control" type="number"
+                            name="priceperhour">
+                        <small id="priceperhourError" class="text-danger"></small>
+                    </div>
+                </div>
+                <div class="form-group row me-4">
+                    <div class="col-sm-offset-2 col-sm-100">
+                        <button class="btn btn-primary" title="Fügt Kunden hinzu" type="submit"><i
+                                class="fas fa-save"></i></button>
+                        <a href="Customer.php" title="Zurück zur Kundenübersicht" class="btn btn-primary"><i
+                                class="fa fa-arrow-left" aria-hidden="true"></i></a>
+                    </div>
                 </div>
             </div>
         </form>

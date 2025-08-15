@@ -19,50 +19,112 @@ if ($_SESSION['userid'] == "") {
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.dataTables.min.css">
 
-    <!-- JS -->
-    <script src="js/jquery.min.js"></script>
-    <script src="js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
+
     <style>
-        /* Allgemeine Einstellungen */
+        /* === Grundlayout === */
+        html,
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f7f6;
+            height: 100%;
             margin: 0;
-            padding: 0;
+            background-color: #dedfe0ff;
+            /* hellgrau statt reinweiß */
         }
 
-        label {
-            font-size: 14px;
-            font-weight: 600;
-            color: #333;
+
+        /* Wrapper nimmt die volle Höhe ein und ist Flex-Container */
+        .wrapper {
+            min-height: 100vh;
+            /* viewport height */
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Tabelle Margins */
-        .custom-container table {
-            margin-left: 1.2rem !important;
-            margin-right: 1.2rem !important;
-            width: 98%;
+        /* Container oder Content-Bereich wächst flexibel */
+        .container {
+            flex: 1;
+            /* nimmt den verfügbaren Platz ein */
         }
 
-        .me-4 {
-            margin-left: 1.2rem !important;
+        /* Footer bleibt unten */
+        footer {
+            /* kein spezielles CSS nötig, wenn wrapper und container wie oben */
         }
 
-        /* Spaltenbreiten optimieren */
-        @media screen and (max-width: 767px) {
+        /* === Karten-Design mit Schatten === */
+        .card {
+            font-size: 0.9rem;
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            /* leichter Schatten */
+            transition: transform 0.2s ease-in-out;
+        }
 
-            .custom-container table {
-                margin-left: 0.2rem !important;
-                margin-right: 0.2rem !important;
-                width: 98%;
-            }
+        .card:hover {
+            transform: scale(1.01);
+            /* kleine Hover-Interaktion */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
 
-            .me-4 {
-                margin-left: 0.2rem !important;
-            }
+        .card-title {
+            font-size: 1.1rem;
+        }
 
+        .card-body p {
+            margin-bottom: 0.5rem;
+        }
+
+        .card-img-top {
+            height: 200px;
+            /* Einheitliche Höhe */
+            object-fit: cover;
+            /* Bild wird beschnitten, nicht verzerrt */
+        }
+
+        /* === Navbar Design === */
+        .navbar-custom {
+            background: linear-gradient(to right, #cce5f6, #e6f2fb);
+            border-bottom: 1px solid #b3d7f2;
+        }
+
+        .navbar-custom .navbar-brand,
+        .navbar-custom .nav-link {
+            color: #0c2c4a;
+            font-weight: 500;
+        }
+
+        .navbar-custom .nav-link:hover,
+        .navbar-custom .nav-link:focus {
+            color: #04588c;
+            text-decoration: underline;
+        }
+
+        .custom-header {
+            background: linear-gradient(to right, #2a55e0ff, #4670e4ff);
+            /* dunkles, klassisches Grün */
+            border-bottom: 2px solid #0666f7ff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 1rem 1rem;
+        }
+
+        .btn-darkgreen {
+            background-color: #0d3dc2ff;
+            border-color: #145214;
+            color: #fff;
+        }
+
+        .btn-darkgreen:hover {
+            background-color: #0337e4ff;
+            ;
+            border-color: #2146beff;
+        }
+
+        .btn {
+            border-radius: 50rem;
+            /* pill-shape */
+            font-size: 0.9rem;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.85rem;
         }
     </style>
 </head>
@@ -88,75 +150,62 @@ if ($_SESSION['userid'] == "") {
 
     $email = $_SESSION['email'];
     $userid = $_SESSION['userid'];
+
+    require_once 'includes/header.php';
     ?>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="TicketUebersicht.php"><i class="fa-solid fa-house"></i></a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
-                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNavDropdown">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a href="TicketUebersicht.php" class="nav-link">Tickets</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="Customer.php" class="nav-link">Kunden</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="Prioritaeten.php" class="nav-link">Prioritäten</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="Stati.php" class="nav-link">Stati</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="Impressum.php" class="nav-link">Impressum</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
 
     <div id="addPriority">
         <form action="AddStatusEntry.php" method="post">
-            <div class="custom-container">
-                <div class="mt-0 p-5 bg-secondary text-white text-center rounded-bottom">
-                    <h1>HelpDesk</h1>
-                    <p>Status Eintrag hinzufügen</p>
-                </div>
+            <header class="custom-header py-2 text-white">
+                <div class="container-fluid">
+                    <div class="row align-items-center">
 
-                <div class="container-fluid mt-3">
-                    <div class="row">
-                        <div class="col-12 text-end">
-                            <?php echo "<span>Angemeldet als: " . htmlspecialchars($email) . "</span>"; ?>
-                            <a class="btn btn-primary" title="Abmelden von HelpDesk" href="logout.php">
-                                <i class="fa fa-sign-out" aria-hidden="true"></i>
+                        <!-- Titel zentriert -->
+                        <div class="col-12 text-center mb-2 mb-md-0">
+                            <h2 class="h4 mb-0">Helpdesk - Status hinzufügen</h2>
+                        </div>
+
+                        <!-- Benutzerinfo + Logout -->
+                        <div class="col-12 col-md-auto ms-md-auto text-center text-md-end">
+                            <!-- Auf kleinen Bildschirmen: eigene Zeile für E-Mail -->
+                            <div class="d-block d-md-inline mb-1 mb-md-0">
+                                <span class="me-2">Angemeldet als: <?= htmlspecialchars($_SESSION['email']) ?></span>
+                            </div>
+                            <!-- Logout-Button -->
+                            <a class="btn btn-darkgreen btn-sm" title="Abmelden vom Webshop" href="logout.php">
+                                <i class="fa fa-sign-out" aria-hidden="true"></i> Ausloggen
                             </a>
                         </div>
                     </div>
                 </div>
-                <br>
-            </div>
+            </header>
             <br>
-            <div class="form-group row me-4">
-                <label class="col-sm-2 col-form-label text-dark">Beschreibung:</label>
-                <div class="col-sm-10">
-                    <input class="form-control" type="text" id="description" name="description" required>
-                    <small id="descriptionError" class="text-danger"></small>
+            <div class="mx-2">
+                <div class="form-group row me-4">
+                    <label class="col-sm-2 col-form-label text-dark">Beschreibung:</label>
+                    <div class="col-sm-10">
+                        <input class="form-control" type="text" id="description" name="description" required>
+                        <small id="descriptionError" class="text-danger"></small>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group row me-4">
-                <div class="col-sm-offset-2 col-sm-10">
-                    <button class="btn btn-primary" type="submit"><i class="fas fa-save"></i></button>
-                    <a href="Stati.php" title="Zurück zun den Stati" class="btn btn-primary"><i class="fa fa-arrow-left"
-                            aria-hidden="true"></i></a>
+                <div class="form-group row me-4">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button class="btn btn-primary" type="submit"><i class="fas fa-save"></i></button>
+                        <a href="Stati.php" title="Zurück zun den Stati" class="btn btn-primary"><i
+                                class="fa fa-arrow-left" aria-hidden="true"></i></a>
+                    </div>
                 </div>
             </div>
         </form>
     </div>
+
+    <!-- JS -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
 
     <script>
         // Heutiges Datum automatisch setzen
@@ -215,7 +264,7 @@ if ($_SESSION['userid'] == "") {
             // Regeln
             const minLength = 3;
             const maxLength = 100;
-            const alphanumericRegex = ^[a-zA-Z0-9äöüÄÖÜß\s\-:]+$;
+            const alphanumericRegex = ^ [a - zA - Z0 - 9äöüÄÖÜß\s\-: ] + $;
 
             let errorMessage = '';
 
