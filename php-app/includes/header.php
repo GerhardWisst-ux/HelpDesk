@@ -31,7 +31,7 @@ $isAdmin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1;
                 </li>
                 <li class="nav-item">
                       <a class="nav-link <?= ($current == 'Prioritaeten.php') ? 'active text-success' : '' ?>"
-                        href="<?= $prefix ?>php-app/Prioritaeten.php">Prioritaeten</a>
+                        href="<?= $prefix ?>php-app/Prioritaeten.php">Prioritäten</a>
                 </li>
                 <li class="nav-item">
                      <a class="nav-link <?= ($current == 'Stati.php') ? 'active text-success' : '' ?>"

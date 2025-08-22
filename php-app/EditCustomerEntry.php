@@ -1,149 +1,174 @@
 <?php
-require 'db.php';
+declare(strict_types=1);
+
+/*
+ * Sicherheits-Header (früh senden)
+ */
+header('Content-Type: text/html; charset=UTF-8');
+header('X-Content-Type-Options: nosniff');
+header('X-Frame-Options: DENY');
+header('Referrer-Policy: no-referrer-when-downgrade');
+header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; form-action 'self'; base-uri 'self';");
+
+/* Sichere Session-Cookies (vor session_start) */
+session_set_cookie_params([
+    'httponly' => true,
+    'secure'   => true, // Nur aktivieren, wenn HTTPS verwendet wird
+    'samesite' => 'Strict'
+]);
 session_start();
 
-
-if (!isset($_SESSION['CustomerID']) || $_SESSION['CustomerID'] == "") {
-    echo "Keine CustomerID angegeben.";
-    exit();
+/* DB-Verbindung laden */
+require 'db.php';
+if ($pdo instanceof PDO) {
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 }
 
+/* Nur POST zulassen */
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    exit('Nur POST erlaubt.');
+}
+
+/* CSRF-Prüfung */
+if (
+    empty($_POST['csrf_token']) ||
+    empty($_SESSION['csrf_token']) ||
+    !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
+) {
+    http_response_code(403);
+    exit('CSRF-Token ungültig.');
+}
+
+/* Nutzerprüfung */
+$userid = $_SESSION['userid'] ?? null;
+if (!$userid || !ctype_digit((string)$userid)) {
+    http_response_code(401);
+    exit('Nicht angemeldet.');
+}
+
+/* CustomerID prüfen */
+$customerID = $_SESSION['CustomerID'] ?? null;
+if (!$customerID || !ctype_digit((string)$customerID)) {
+    http_response_code(400);
+    exit('Keine gültige CustomerID angegeben.');
+}
+
+/* Status */
 $active = 0;
 
-// Regeln
+/* Validierungsparameter */
 $minLength = 3;
 $maxLength = 100;
 $alphanumericRegex = '/^[a-zA-Z0-9äöüÄÖÜß\s\-:.]+$/';
 
-$zusatz = trim($_POST['zusatz']);
-$firma = trim($_POST['firma']);
-$street = trim($_POST['street']);
-$location = trim($_POST['location']);
-$mail = trim($_POST['mail']);
-$internet = trim($_POST['internet']);
-$telefon = trim($_POST['telefon']);
-$fax = trim($_POST['fax']);
-$zip = trim($_POST['zip']);
-
-// Validierung
-if (strlen($zusatz) > $maxLength) {
-    die("Fehler: Der Zusatz darf maximal $maxLength Zeichen lang sein.");
-}
-if (!preg_match($alphanumericRegex, $zusatz)) {
-    die("Fehler: Der Zusatz darf nur Buchstaben, Zahlen und Leerzeichen enthalten.");
-}
-
-if (strlen($firma) < $minLength) {
-    die("Fehler: Die Firma muss mindestens $minLength Zeichen lang sein.");
-}
-if (strlen($firma) > $maxLength) {
-    die("Fehler: Die Firma darf maximal $maxLength Zeichen lang sein.");
-}
-if (!preg_match($alphanumericRegex, $firma)) {
-    die("Fehler: Die Firma darf nur Buchstaben, Zahlen und Leerzeichen enthalten.");
-}
-
-if (strlen($street) < $minLength) {
-    die("Fehler: Die Straße muss mindestens $minLength Zeichen lang sein.");
-}
-if (strlen($street) > $maxLength) {
-    die("Fehler: Die Straße darf darf maximal $maxLength Zeichen lang sein.");
-}
-if (!preg_match($alphanumericRegex, $street)) {
-    die("Fehler: Die Straße darf nur Buchstaben, Zahlen und Leerzeichen enthalten.");
-}
-
-if (strlen($location) < $minLength) {
-    die("Fehler: Der Ort muss mindestens $minLength Zeichen lang sein.");
-}
-if (strlen($location) > $maxLength) {
-    die("Fehler: Der Ort darf darf maximal $maxLength Zeichen lang sein.");
-}
-if (!preg_match($alphanumericRegex, $location)) {
-    die("Fehler: Der Ort darf nur Buchstaben, Zahlen und Leerzeichen enthalten.");
-}
-
-if (strlen($mail) > $maxLength) {
-    die("Fehler: Die Mail darf darf maximal $maxLength Zeichen lang sein.");
-}
-
-if (strlen($internet) < $minLength) {
-    die("Fehler: Die Internet-Adresse muss mindestens $minLength Zeichen lang sein.");
-}
-if (strlen($internet) > $maxLength) {
-    die("Fehler: Die Internet-Adresse darf darf maximal $maxLength Zeichen lang sein.");
-}
-
-
-// Um sicherzustellen, dass die URL gültig ist, füge "http://" hinzu, falls nicht vorhanden
-if (!preg_match('/^https?:\/\//', $internet)) {
-    $internet = "http://" . $internet;
-}
-
-if (!filter_var($internet, FILTER_VALIDATE_URL)) {
-    die("Die URL ist ungültig.");
-}
-
-// Regulärer Ausdruck für die E-Mail-Validierung
-$regex = '/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/';
-if (!preg_match($regex, $mail)) {
-    die("E-Mail-Adresse ist ungültig..");
-}
-
-$customerID = $_SESSION['CustomerID'];
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $zusatz = htmlspecialchars($_POST['zusatz'], ENT_QUOTES, 'UTF-8');
-    $firma = htmlspecialchars($_POST['firma'], ENT_QUOTES, 'UTF-8');
-    $street = htmlspecialchars($_POST['street'], ENT_QUOTES, 'UTF-8');
-    $location = htmlspecialchars($_POST['location'], ENT_QUOTES, 'UTF-8');
-    $mail = htmlspecialchars($_POST['mail'], ENT_QUOTES, 'UTF-8');
-    $internet = htmlspecialchars($_POST['internet'], ENT_QUOTES, 'UTF-8');
-    $telefon = htmlspecialchars($_POST['telefon'], ENT_QUOTES, 'UTF-8');
-    $fax = htmlspecialchars($_POST['fax'], ENT_QUOTES, 'UTF-8');
-    $zip = htmlspecialchars($_POST['zip'], ENT_QUOTES, 'UTF-8');
-
-
-    if (!isset($_POST['active']) || $_POST['active'] == "")
-        $active = 0;
-    else
-        $active = 1;
-   
-    try {
-        // Update-Statement
-        $sql = "UPDATE customer 
-                SET zusatz = :zusatz, 
-                    firma = :firma, 
-                    street = :street, 
-                    zip = :zip,   
-                    location = :location,   
-                    mail = :mail,
-                    internet = :internet,
-                    telefon = :telefon,
-                    fax = :fax,
-                    active = :active 
-                WHERE CustomerID = :customerID";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([
-            'customerID' => $customerID,
-            'zusatz' => $zusatz,
-            'firma' => $firma,
-            'street' => $street,
-            'zip' => $zip,
-            'location' => $location,
-            'mail' => $mail,
-            'internet' => $internet,
-            'telefon' => $telefon,
-            'fax' => $fax,
-            'active' => $active
-        ]);
-
-        echo "Position mit der ID" . $id . " wurde upgedatet!";
-        header('Location: Customer.php');
-        exit();
-    } catch (PDOException $e) {
-        echo "Fehler beim Aktualisieren: " . $e->getMessage();
-        exit();
+/**
+ * Hilfsfunktion: Eingabe prüfen
+ */
+function validateInput(string $value, string $field, int $min, int $max, string $pattern): void {
+    $len = mb_strlen($value);
+    if ($len < $min) {
+        exit("Fehler: $field muss mindestens $min Zeichen lang sein.");
+    }
+    if ($len > $max) {
+        exit("Fehler: $field darf maximal $max Zeichen lang sein.");
+    }
+    if (!preg_match($pattern, $value)) {
+        exit("Fehler: $field enthält ungültige Zeichen.");
     }
 }
-?>
+
+/* Eingaben bereinigen */
+$firma        = trim($_POST['firma'] ?? '');
+$zusatz       = trim($_POST['zusatz'] ?? '');
+$street       = trim($_POST['street'] ?? '');
+$location     = trim($_POST['location'] ?? '');
+$mail         = trim($_POST['mail'] ?? '');
+$internet     = trim($_POST['internet'] ?? '');
+$telefon      = trim($_POST['telefon'] ?? '');
+$fax          = trim($_POST['fax'] ?? '');
+$zip          = trim($_POST['zip'] ?? '');
+$priceperhour = trim($_POST['priceperhour'] ?? '');
+
+/* Validierung */
+validateInput($firma, 'Firma', $minLength, $maxLength, $alphanumericRegex);
+validateInput($street, 'Straße', $minLength, $maxLength, $alphanumericRegex);
+validateInput($location, 'Ort', $minLength, $maxLength, $alphanumericRegex);
+if ($zusatz && !preg_match($alphanumericRegex, $zusatz)) {
+    exit('Fehler: Zusatz enthält ungültige Zeichen.');
+}
+if (mb_strlen($internet) > $maxLength) {
+    exit("Fehler: Die Internet-Adresse darf maximal $maxLength Zeichen lang sein.");
+}
+
+try {
+    $pdo->beginTransaction();
+
+    // **Duplikatsprüfung**
+    $check = $pdo->prepare("
+        SELECT COUNT(*) FROM customer WHERE firma = :firma AND userid = :userid AND CustomerID != :customerID
+    ");
+    $check->execute([
+        ':firma'      => $firma,
+        ':userid'     => (int)$userid,
+        ':customerID' => (int)$customerID
+    ]);
+
+    if ((int)$check->fetchColumn() > 0) {
+        $pdo->rollBack();
+        header('Location: Customer.php?exists=1', true, 303);
+        exit;
+    }
+
+    // **Update-Statement**
+    $sql = "
+        UPDATE customer 
+        SET zusatz = :zusatz, 
+            firma = :firma, 
+            street = :street, 
+            zip = :zip,   
+            location = :location,   
+            mail = :mail,
+            internet = :internet,
+            telefon = :telefon,
+            fax = :fax,
+            active = :active 
+        WHERE CustomerID = :customerID
+    ";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([
+        ':customerID' => $customerID,
+        ':zusatz'     => $zusatz,
+        ':firma'      => $firma,
+        ':street'     => $street,
+        ':zip'        => $zip,
+        ':location'   => $location,
+        ':mail'       => $mail,
+        ':internet'   => $internet,
+        ':telefon'    => $telefon,
+        ':fax'        => $fax,
+        ':active'     => $active
+    ]);
+
+    $pdo->commit();
+
+    // CSRF-Token invalidieren
+    unset($_SESSION['csrf_token']);
+
+    header('Location: Customer.php?success=1', true, 303);
+    exit;
+
+} catch (Throwable $e) {
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+
+    if ($e instanceof PDOException && $e->getCode() === '23000') {
+        header('Location: Customer.php?exists=1', true, 303);
+        exit;
+    }
+
+    error_log('Customer-Update-Fehler: ' . $e->getMessage());
+    http_response_code(500);
+    exit('Ein Fehler ist aufgetreten. Bitte später erneut versuchen.');
+}

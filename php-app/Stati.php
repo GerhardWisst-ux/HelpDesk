@@ -8,6 +8,7 @@ session_start();
 if ($_SESSION['userid'] == "") {
     header('Location: Login.php'); // zum Loginformular
 }
+
 ?>
 
 <head>
@@ -18,116 +19,19 @@ if ($_SESSION['userid'] == "") {
     <!-- CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.dataTables.min.css">
-
-
-    <style>
-        /* === Grundlayout === */
-        html,
-        body {
-            height: 100%;
-            margin: 0;
-            background-color: #dedfe0ff;
-            /* hellgrau statt reinweiß */
-        }
-
-
-        /* Wrapper nimmt die volle Höhe ein und ist Flex-Container */
-        .wrapper {
-            min-height: 100vh;
-            /* viewport height */
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Container oder Content-Bereich wächst flexibel */
-        .container {
-            flex: 1;
-            /* nimmt den verfügbaren Platz ein */
-        }
-
-        /* Footer bleibt unten */
-        footer {
-            /* kein spezielles CSS nötig, wenn wrapper und container wie oben */
-        }
-
-        /* === Karten-Design mit Schatten === */
-        .card {
+    <link href="css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="css/responsive.dataTables.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <style>     
+        #TableStati {
+            width: 100%;
             font-size: 0.9rem;
-            background-color: #ffffff;
-            border: 1px solid #dee2e6;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-            /* leichter Schatten */
-            transition: transform 0.2s ease-in-out;
         }
 
-        .card:hover {
-            transform: scale(1.01);
-            /* kleine Hover-Interaktion */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        #TableStati tbody tr:hover {
+            background-color: #f1f5ff;
         }
-
-        .card-title {
-            font-size: 1.1rem;
-        }
-
-        .card-body p {
-            margin-bottom: 0.5rem;
-        }
-
-        .card-img-top {
-            height: 200px;
-            /* Einheitliche Höhe */
-            object-fit: cover;
-            /* Bild wird beschnitten, nicht verzerrt */
-        }
-
-        /* === Navbar Design === */
-        .navbar-custom {
-            background: linear-gradient(to right, #cce5f6, #e6f2fb);
-            border-bottom: 1px solid #b3d7f2;
-        }
-
-        .navbar-custom .navbar-brand,
-        .navbar-custom .nav-link {
-            color: #0c2c4a;
-            font-weight: 500;
-        }
-
-        .navbar-custom .nav-link:hover,
-        .navbar-custom .nav-link:focus {
-            color: #04588c;
-            text-decoration: underline;
-        }
-
-        .custom-header {
-            background: linear-gradient(to right, #2a55e0ff, #4670e4ff);
-            /* dunkles, klassisches Grün */
-            border-bottom: 2px solid #0666f7ff;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            border-radius: 0 0 1rem 1rem;
-        }
-
-        .btn-darkgreen {
-            background-color: #0d3dc2ff;
-            border-color: #145214;
-            color: #fff;
-        }
-
-        .btn-darkgreen:hover {
-            background-color: #0337e4ff;
-            ;
-            border-color: #2146beff;
-        }
-
-        .btn {
-            border-radius: 50rem;
-            /* pill-shape */
-            font-size: 0.9rem;
-            padding: 0.375rem 0.75rem;
-            font-size: 0.85rem;
-        }
+     
     </style>
 </head>
 
@@ -139,10 +43,17 @@ if ($_SESSION['userid'] == "") {
     $email = $_SESSION['email'];
 
     require_once 'includes/header.php';
+
+    // CSRF-Token erzeugen
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
     ?>
 
     <div id="stati">
         <form id="staiform">
+            <input type="hidden" id="csrf_token" name="csrf_token"
+                value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
             <header class="custom-header py-2 text-white">
                 <div class="container-fluid">
                     <div class="row align-items-center">
@@ -178,8 +89,8 @@ if ($_SESSION['userid'] == "") {
 
             ?>
             <br>
-            <div class="custom-container mx-2">
-                <table id="TableStati" class="display nowrap">
+            <div class="table-responsive mx-2">
+                <table id="TableStati" class="display nowrap table table-striped w-100">
                     <thead>
                         <tr>
                             <th>Beschreibung</th>
@@ -244,8 +155,9 @@ if ($_SESSION['userid'] == "") {
         <!-- JS -->
         <script src="js/jquery.min.js"></script>
         <script src="js/bootstrap.bundle.min.js"></script>
-        <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-        <script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
+        <script src="js/jquery.dataTables.min.js"></script>
+        <script src="js/dataTables.min.js"></script>
+        <script src="js/dataTables.responsive.min.js"></script>
 
         <script>
             $(document).ready(function () {
@@ -260,7 +172,6 @@ if ($_SESSION['userid'] == "") {
 
                 $('#confirmDeleteBtn').on('click', function () {
                     if (deleteId) {
-                        // Dynamisches Formular erstellen und absenden
                         const form = $('<form>', {
                             action: 'DeleteStatus.php',
                             method: 'POST'
@@ -268,14 +179,17 @@ if ($_SESSION['userid'] == "") {
                             type: 'hidden',
                             name: 'id',
                             value: deleteId
+                        })).append($('<input>', {
+                            type: 'hidden',
+                            name: 'csrf_token',
+                            value: $('#csrf_token').val() // <- Das Session-Token wird übernommen
                         }));
 
                         $('body').append(form);
                         form.submit();
                     }
-                    $('#confirmDeleteModal').modal('hide'); // Schließe das Modal
+                    $('#confirmDeleteModal').modal('hide');
 
-                    // Zeige den Toast an
                     var toast = new bootstrap.Toast($('#deleteToast')[0]);
                     toast.show();
                 });
@@ -292,22 +206,26 @@ if ($_SESSION['userid'] == "") {
 
             $(document).ready(function () {
                 $('#TableStati').DataTable({
-                    language: {
-                        url: "https://cdn.datatables.net/plug-ins/1.13.4/i18n/de-DE.json"
-                    },
-                    responsive: true,
-                    pageLength: 10,
-                    autoWidth: false,
-                    columnDefs: [
-                        {
-                            targets: 1,
-                            className: "dt-body-nowrap" // Keine Zeilenumbrüche
+                    language: { url: "https://cdn.datatables.net/plug-ins/1.13.4/i18n/de-DE.json" },
+                    responsive: {
+                        details: {
+                            display: $.fn.dataTable.Responsive.display.modal({
+                                header: function (row) {
+                                    var data = row.data();
+                                    return 'Details zu ' + data[1];
+                                }
+                            }),
+                            renderer: $.fn.dataTable.Responsive.renderer.tableAll({
+                                tableClass: 'table'
+                            })
                         }
-                    ]
+                    },
+                    scrollX: false,
+                    pageLength: 50,
+                    autoWidth: false
                 });
             });
         </script>
-
 </body>
 
 </html>

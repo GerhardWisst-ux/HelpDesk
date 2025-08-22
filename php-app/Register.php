@@ -9,56 +9,96 @@
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-    <style>
-        /* Gesamte Seite mit Flexbox zentrieren */
-        body,
-        html {
-            margin: 0;
-            padding: 0;
+      <style>
+        /* === Grundlayout === */
+        html,
+        body {
             height: 100%;
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f7f6;
+            margin: 0;
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
         }
 
-        /* Layout mit Navbar */
-        #content {
+        /* Wrapper für Flex */
+        .wrapper {
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            height: calc(100vh - 56px);
-            /* Abzug der Navbar-Höhe */
+            flex-direction: column;
         }
 
-        /* Login-Box Styling */
-        #login-box {
-            width: 100%;
-            max-width: 400px;
+        /* === Navbar & Header === */
+        .custom-header {
+            background: linear-gradient(90deg, #1e3c72, #2a5298);
+            color: #fff;
+            height: 40px;
+            border-bottom: 2px solid #1b3a6d;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            border-radius: 1px 1px 1px 1px;
+        }
+
+        .custom-header h2 {
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* === Buttons === */
+        .btn-custom {
+            background-color: #1e3c72 !important;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            padding: 0.45rem 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary-custom {
+            color: linear-gradient(90deg, #1e3c72, #2a5298) !important;
+            background-color: #1e3c72 !important;
+            border-color: #1e3c72 !important;
+        }
+
+        .btn-primary-custom:hover {
+            background-color: #1e3c72 !important;
+        }
+
+
+        /* === Karten & Tabellen === */
+        .custom-container {
             background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            /* padding: 20px; */
+            margin-top: 0px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
         }
 
-        /* Abstand zwischen Feldern */
-        .input_box {
-            margin-bottom: 20px;
+
+        /* === Navbar Design === */
+        .navbar-custom {
+            background: linear-gradient(to right, #cce5f6, #e6f2fb);
+            border-bottom: 1px solid #b3d7f2;
         }
 
-        /* Button Styling */
-        .btn-login {
-            width: 100%;
-            padding: 10px;
+        .navbar-custom .navbar-brand,
+        .navbar-custom .nav-link {
+            color: #0c2c4a;
+            font-weight: 500;
         }
 
-        /* Link Styling */
-        #register-link a {
-            font-size: 14px;
-            text-decoration: none;
-            color: #333;
-        }
-
-        #register-link a:hover {
+        .navbar-custom .nav-link:hover,
+        .navbar-custom .nav-link:focus {
+            color: #04588c;
             text-decoration: underline;
+        }
+
+        /* === Modal === */
+        .modal-content {
+            border-radius: 12px;
+        }
+
+        .modal-header {
+            background-color: #0946c9ff;
+            color: #fff;
+            border-radius: 12px 12px 0 0;
         }
     </style>
 </head>
@@ -73,13 +113,13 @@
     session_start();
 
     require 'db.php';
-   
+
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
         // foreach ($_POST as $key => $value) {
         //     echo htmlspecialchars($key) . " = " . htmlspecialchars($value) . "<br>";
         // }
-
+    
         $error = false;
         $email = trim($_POST['email']);
         $passwort = $_POST['passwort'];
@@ -121,70 +161,55 @@
     }
     ?>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="TicketUebersicht.php"><i class="fa-solid fa-house"></i></a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
-                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNavDropdown">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a href="TicketUebersicht.php" class="nav-link">Tickets</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="Customer.php" class="nav-link">Kunden</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="Prioritaeten.php" class="nav-link">Prioritäten</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="Stati.php" class="nav-link">Stati</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="Impressum.php" class="nav-link">Impressum</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
 
     <!-- Inhalt mit Login-Form -->
-    <div id="content">
-        <div id="login-box">
-            <h1 class="text-center">HelpDesk Registrierung</h1>
-            <form id="loginform" method="post" action="?register=1" class="login_form needs-validation" novalidate>
-                <div class="input_box">
-                    <label for="email" class="text-dark">Benutzer:</label>
-                    <input type="email" name="email" id="email" class="form-control" placeholder="E-Mail eingeben"
-                        required>
-                </div>
-                <div class="input_box">
-                    <label for="passwort" class="text-dark">Passwort:</label><br>
-                    <input type="password" name="passwort" placeholder="Passwort eingeben" required id="passwort"
-                        class="form-control">
-                </div>
-                <div class="input_box">
-                    <label for="passwort2" class="text-dark">Passwort bestätigen:</label><br>
-                    <input type="password" name="passwort2" placeholder="Passwort erneut eingeben" required
-                        id="passwort2" class="form-control">
-                </div>
-                <div class="input_box">
-                    <button type="submit" style="width: 100%;" class="btn btn-secondary" name="register" id="register">
-                        Speichern
-                    </button>
-                </div>
+    <div id="register">
+        <form id="loginform" method="post" action="?register=1" class="needs-validation" novalidate>
+            <div class="container mt-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="card shadow-lg border-0">
+                            <div class="custom-header bg-primary text-white text-center">
+                                <h4 class="mb-0">Helpdesk Registrierung</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="email" class="text-dark">Benutzer:</label>
+                                    <input type="email" name="email" id="email" class="form-control"
+                                        placeholder="E-Mail eingeben" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="passwort" class="form-label">Passwort:</label>
+                                    <input type="password" name="passwort" id="passwort" class="form-control" required
+                                        placeholder="Passwort eingeben">
+                                </div>
 
-                <div id="error-link" class="text-danger">
-                    <?php if (isset($errorMessage))
-                        echo $errorMessage; ?>
+                                <div class="mb-3">
+                                    <label for="passwort2" class="form-label">Passwort bestätigen:</label>
+                                    <input type="password" name="passwort2" id="passwort2" class="form-control" required
+                                        placeholder="Passwort erneut eingeben">
+                                </div>
+                                <br>
+                                <div class="mb-3">
+                                    <button type="submit" style="width: 100%;" class="btn-custom text-white rounded-pill" name=" register" id="register">                                        
+                                        Speichern
+                                    </button>
+                                </div>
+
+                                <div id="error-link" class="text-danger">
+                                    <?php if (isset($errorMessage))
+                                        echo $errorMessage; ?>
+                                </div>
+                                <div id="login-link" class="text-center">
+                                    <a href="Login.php">Login</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div id="login-link" class="text-center">
-                    <a href="Login.php">Login</a>
-                </div>
-            </form>
-        </div>
+            </div>
+        </form>
+    </div>
     </div>
 
     <script src="js/jquery.min.js"></script>

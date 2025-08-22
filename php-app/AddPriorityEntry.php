@@ -1,53 +1,114 @@
-<head>
-  <title>HelpDesk Hinzufügen Priorität</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- CSS -->
-  <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-  <!-- JS -->
-  <script src="js/jquery.min.js"></script>
-  <script src="js/bootstrap.bundle.min.js"></script>
-</head>
-<body>
 <?php
+declare(strict_types=1);
 
-require 'db.php';
+/*
+ * Sicherheits-Header (früh senden)
+ * Hinweis: Passe die CSP an, falls du externe Skripte/Styles brauchst.
+ */
+header('Content-Type: text/html; charset=UTF-8');
+header('X-Content-Type-Options: nosniff');
+header('X-Frame-Options: DENY');
+header("Referrer-Policy: no-referrer-when-downgrade");
+header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; form-action 'self'; base-uri 'self';");
+
+/* Sichere Session-Cookies (vor session_start) */
+session_set_cookie_params([
+    'httponly' => true,
+    'secure' => true, // Nur aktivieren, wenn HTTPS verwendet wird
+    'samesite' => 'Strict'
+]);
 session_start();
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $description = trim($_POST['description']);
-
-    // Regeln
-    $minLength = 3;
-    $maxLength = 100;
-    $alphanumericRegex = '/^[a-zA-Z0-9äöüÄÖÜß\s\-:]+$/';
-
-    // Validierung
-    if (strlen($description) < $minLength) {
-        die("Fehler: Die Beschreibung muss mindestens $minLength Zeichen lang sein.");
-    }
-    if (strlen($description) > $maxLength) {
-        die("Fehler: Die Beschreibung darf maximal $maxLength Zeichen lang sein.");
-    }
-    if (!preg_match($alphanumericRegex, $description)) {
-        die("Fehler: Die Beschreibung darf nur Buchstaben, Zahlen und Leerzeichen enthalten.");
-    }
+/* DB-Verbindung laden (PDO im Exception-Modus empfohlen) */
+require 'db.php';
+if ($pdo instanceof PDO) {
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {    
-    $description = $_POST['description'];
-    
+/* Nur POST zulassen */
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    exit('Nur POST erlaubt.');
+}
+
+/* CSRF-Prüfung */
+if (
+    empty($_POST['csrf_token']) ||
+    empty($_SESSION['csrf_token']) ||
+    !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
+) {
+    http_response_code(403);
+    exit('CSRF-Token ungültig.');
+}
+
+/* Nutzerprüfung */
+$userid = $_SESSION['userid'] ?? null;
+if (!$userid || !ctype_digit((string) $userid)) {
+    http_response_code(401);
+    exit('Nicht angemeldet.');
+}
+
+/* Validierungsparameter */
+$minLength = 3;
+$maxLength = 100;
+$alphanumericRegex = '/^[a-zA-Z0-9äöüÄÖÜß\s\-:.]+$/';
+
+/* Eingaben bereinigen */
+$description = trim((string) ($_POST['description'] ?? ''));
+
+// Validierung
+if (strlen($description) < $minLength) {
+    die("Fehler: Die Beschreibung muss mindestens $minLength Zeichen lang sein.");
+}
+if (strlen($description) > $maxLength) {
+    die("Fehler: Die Beschreibung darf maximal $maxLength Zeichen lang sein.");
+}
+if (!preg_match($alphanumericRegex, $description)) {
+    die("Fehler: Die Beschreibung darf nur Buchstaben, Zahlen und Leerzeichen enthalten.");
+}
+
+
+/* Datenbank-Operation */
+try {
+    $pdo->beginTransaction();
+
+    // Duplikatsprüfung pro Nutzer
+    $check = $pdo->prepare("
+        SELECT COUNT(*) FROM priority WHERE description = :description AND userid = :userid
+    ");
+    $check->execute([
+        ':description' => $description,
+        ':userid' => (int) $userid
+    ]);
+    if ($check->fetchColumn() > 0) {
+        $pdo->rollBack();
+        header('Location: Prioritaeten.php?exists=1', true, 303);
+        exit;
+    }
 
     $sql = "INSERT INTO priority (Description) VALUES (:description)";
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['description' => $description]);
 
-    echo "Priorität hinzugefügt!";
-    sleep(3);
-    header('Location: Prioritaeten.php'); // Zurück zur Übersicht
-    
+    $pdo->commit();
+
+    // CSRF-Token nach erfolgreichem POST rotieren
+    unset($_SESSION['csrf_token']);
+
+    header('Location: Prioritaeten.php?success=1', true, 303);
+    exit;
+} catch (Throwable $e) {
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+
+    if ($e instanceof PDOException && $e->getCode() === '23000') {
+        header('Location: Prioritaeten.php?exists=1', true, 303);
+        exit;
+    }
+    error_log('Prioritaeten-Insert-Fehler: ' . $e->getMessage());
+    http_response_code(500);
+    exit('Ein Fehler ist aufgetreten. Bitte später erneut versuchen.');
 }
+
 ?>
-</body>

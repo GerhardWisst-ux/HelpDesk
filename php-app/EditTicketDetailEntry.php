@@ -1,59 +1,84 @@
 <?php
-require 'db.php';
+declare(strict_types=1);
+
+/*
+ * Sicherheits-Header (früh senden)
+ * Hinweis: Passe die CSP an, falls du externe Skripte/Styles brauchst.
+ */
+header('Content-Type: text/html; charset=UTF-8');
+header('X-Content-Type-Options: nosniff');
+header('X-Frame-Options: DENY');
+header("Referrer-Policy: no-referrer-when-downgrade");
+header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; form-action 'self'; base-uri 'self';");
+
+/* Sichere Session-Cookies (vor session_start) */
+session_set_cookie_params([
+    'httponly' => true,
+    'secure' => true, // Nur aktivieren, wenn HTTPS verwendet wird
+    'samesite' => 'Strict'
+]);
 session_start();
 
-// Regeln
-$alphanumericRegex = '/[A-Za-zäöüßÄÖÜß\s\-]+(?:\s\d+[a-zA-Z]?)?$/';
-$minLength = 3;
-$maxLength = 100;
-
-
-if (!isset($_SESSION['TicketID']) || $_SESSION['TicketID'] == "") {
-    echo "Keine TicketID angegeben.";
-    exit();
+/* DB-Verbindung laden (PDO im Exception-Modus empfohlen) */
+require 'db.php';
+if ($pdo instanceof PDO) {
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 }
 
+/* Nur POST zulassen */
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    exit('Nur POST erlaubt.');
+}
+
+/* CSRF-Prüfung */
+if (
+    empty($_POST['csrf_token']) ||
+    empty($_SESSION['csrf_token']) ||
+    !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
+) {
+    http_response_code(403);
+    exit('CSRF-Token ungültig.');
+}
+
+// TicketDetailID prüfen
+if (!isset($_SESSION['TicketDetailID']) || !ctype_digit((string) $_SESSION['TicketDetailID'])) {
+    die("Fehler: Ungültige TicketDetailID.");
+}
+$TicketDetailID = (int) $_SESSION['TicketDetailID'];
+
+// TicketID prüfen
+if (!isset($_SESSION['TicketID']) || !ctype_digit((string) $_SESSION['TicketID'])) {
+    die("Fehler: Ungültige TicketID.");
+}
+$TicketID = (int) $_SESSION['TicketID'];
+
+// description prüfen
 $description = trim($_POST['description']);
-// Validierung
-if (strlen($description) < $minLength) {
-    die("Fehler: Die Beschreibung muss mindestens $minLength Zeichen lang sein.");
-}
-if (strlen($description) > $maxLength) {
-    die("Fehler: Die Beschreibung darf maximal $maxLength Zeichen lang sein.");
+if (strlen($description) < $minLength || strlen($description) > $maxLength) {
+    die("Fehler: Beschreibung ungültig.");
 }
 if (!preg_match($alphanumericRegex, $description)) {
-    die("Fehler: Die Beschreibung darf nur Buchstaben, Zahlen und Leerzeichen enthalten.");
+    die("Fehler: Beschreibung enthält unzulässige Zeichen.");
 }
 
-
+// notes prüfen
 $notes = trim($_POST['notes']);
-
-// Validierung
-if (strlen($notes) < $minLength) {
-    die("Fehler: Die Bemerkung muss mindestens $minLength Zeichen lang sein.");
-}
-if (strlen($notes) > $maxLength) {
-    die("Fehler: Die Bemerkung darf maximal $maxLength Zeichen lang sein.");
+if (strlen($notes) < $minLength || strlen($notes) > $maxLength) {
+    die("Fehler: Bemerkung ungültig.");
 }
 if (!preg_match($alphanumericRegex, $notes)) {
-    die("Fehler: Die Beschreibung darf nur Buchstaben, Zahlen und Leerzeichen enthalten.");
+    die("Fehler: Bemerkung enthält unzulässige Zeichen.");
 }
 
+// billingHours prüfen
+$billingHours = trim($_POST['billingHours']);
+if (!is_numeric($billingHours) || $billingHours < 0 || $billingHours > 1000) {
+    die("Fehler: Ungültige Stundenangabe.");
+}
 
-
-$TicketID = $_SESSION['TicketID'];
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') 
-{
-    // print_r($_POST);
-    $TicketDetailID = $_SESSION['TicketDetailID'];
-    $TicketID = $_SESSION['TicketID'];   
-    $description = htmlspecialchars($_POST['description'], ENT_QUOTES, 'UTF-8');
-    $notes = htmlspecialchars($_POST['notes'], ENT_QUOTES, 'UTF-8');
-    $billingHours = htmlspecialchars($_POST['billingHours'], ENT_QUOTES, 'UTF-8');
-
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        // Update-Statement
         $sql = "UPDATE ticketdetail 
                 SET ticketID = :ticketID,                    
                     billingHours = :billingHours,                       
@@ -63,18 +88,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             'TicketDetailID' => $TicketDetailID,
-            'ticketID' => $TicketID,            
-            'billingHours' => $billingHours,           
+            'ticketID' => $TicketID,
+            'billingHours' => $billingHours,
             'description' => $description,
             'notes' => $notes,
         ]);
 
-        echo "Position mit der ID" . $TicketDetailID . " wurde upgedatet!";
-        header('Location: ShowTickets.php?TicketID=' . $_SESSION['TicketID']); // Zurück zur Übersicht    
+        header('Location: ShowTickets.php?TicketID=' . $TicketID);
         exit();
     } catch (PDOException $e) {
-        echo "Fehler beim Aktualisieren: " . $e->getMessage();       
-        exit();
+        error_log("DB-Fehler: " . $e->getMessage());
+        die("Fehler beim Aktualisieren. Bitte später erneut versuchen.");
     }
 }
 ?>

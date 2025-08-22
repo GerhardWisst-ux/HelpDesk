@@ -14,118 +14,12 @@ if ($_SESSION['userid'] == "") {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>HelpDesk TicketDetail hinzufügen</title>
 
+    <!-- CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.dataTables.min.css">
-
-    <style>
-        /* === Grundlayout === */
-        html,
-        body {
-            height: 100%;
-            margin: 0;
-            background-color: #dedfe0ff;
-            /* hellgrau statt reinweiß */
-        }
-
-
-        /* Wrapper nimmt die volle Höhe ein und ist Flex-Container */
-        .wrapper {
-            min-height: 100vh;
-            /* viewport height */
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Container oder Content-Bereich wächst flexibel */
-        .container {
-            flex: 1;
-            /* nimmt den verfügbaren Platz ein */
-        }
-
-        /* Footer bleibt unten */
-        footer {
-            /* kein spezielles CSS nötig, wenn wrapper und container wie oben */
-        }
-
-        /* === Karten-Design mit Schatten === */
-        .card {
-            font-size: 0.9rem;
-            background-color: #ffffff;
-            border: 1px solid #dee2e6;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-            /* leichter Schatten */
-            transition: transform 0.2s ease-in-out;
-        }
-
-        .card:hover {
-            transform: scale(1.01);
-            /* kleine Hover-Interaktion */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
-
-        .card-title {
-            font-size: 1.1rem;
-        }
-
-        .card-body p {
-            margin-bottom: 0.5rem;
-        }
-
-        .card-img-top {
-            height: 200px;
-            /* Einheitliche Höhe */
-            object-fit: cover;
-            /* Bild wird beschnitten, nicht verzerrt */
-        }
-
-        /* === Navbar Design === */
-        .navbar-custom {
-            background: linear-gradient(to right, #cce5f6, #e6f2fb);
-            border-bottom: 1px solid #b3d7f2;
-        }
-
-        .navbar-custom .navbar-brand,
-        .navbar-custom .nav-link {
-            color: #0c2c4a;
-            font-weight: 500;
-        }
-
-        .navbar-custom .nav-link:hover,
-        .navbar-custom .nav-link:focus {
-            color: #04588c;
-            text-decoration: underline;
-        }
-
-        .custom-header {
-            background: linear-gradient(to right, #2a55e0ff, #4670e4ff);
-            /* dunkles, klassisches Grün */
-            border-bottom: 2px solid #0666f7ff;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            border-radius: 0 0 1rem 1rem;
-        }
-
-        .btn-darkgreen {
-            background-color: #0d3dc2ff;
-            border-color: #145214;
-            color: #fff;
-        }
-
-        .btn-darkgreen:hover {
-            background-color: #0337e4ff;
-            ;
-            border-color: #2146beff;
-        }
-
-        .btn {
-            border-radius: 50rem;
-            /* pill-shape */
-            font-size: 0.9rem;
-            padding: 0.375rem 0.75rem;
-            font-size: 0.85rem;
-        }
-    </style>
+    <link href="css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="css/responsive.dataTables.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
 </head>
 
 <body>
@@ -213,8 +107,10 @@ if ($_SESSION['userid'] == "") {
                 <div class="form-group row me-4">
                     <div class="col-sm-offset-2 col-sm-10">
                         <button class="btn btn-primary" type="submit"><i class="fas fa-save"></i></button>
-                        <a href="ShowTickets.php" title="Zurück zur Hauptübersicht" class="btn btn-primary"><i
-                                class="fa fa-arrow-left" aria-hidden="true"></i></a>
+
+                        <a href="ShowTickets.php?TicketID=<?= $_SESSION['TicketID'] ?>"
+                            title="Zurück zur Hauptübersicht" class="btn btn-primary"><i class="fa fa-arrow-left"
+                                aria-hidden="true"></i></a>
                     </div>
                 </div>
             </div>
@@ -224,8 +120,6 @@ if ($_SESSION['userid'] == "") {
     <!-- JS -->
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
 
     <script>
         // Heutiges Datum automatisch setzen

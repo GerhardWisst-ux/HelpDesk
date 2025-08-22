@@ -15,118 +15,21 @@ if ($_SESSION['userid'] == "") {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>HelpDesk Ticketübersicht</title>
 
-    <!-- CSS -->
+      <!-- CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.dataTables.min.css">
-
+    <link href="css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="css/responsive.dataTables.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
 
     <style>
-        /* === Grundlayout === */
-        html,
-        body {
-            height: 100%;
-            margin: 0;
-            background-color: #dedfe0ff;
-            /* hellgrau statt reinweiß */
-        }
-
-
-        /* Wrapper nimmt die volle Höhe ein und ist Flex-Container */
-        .wrapper {
-            min-height: 100vh;
-            /* viewport height */
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Container oder Content-Bereich wächst flexibel */
-        .container {
-            flex: 1;
-            /* nimmt den verfügbaren Platz ein */
-        }
-
-        /* Footer bleibt unten */
-        footer {
-            /* kein spezielles CSS nötig, wenn wrapper und container wie oben */
-        }
-
-        /* === Karten-Design mit Schatten === */
-        .card {
+        #TableTickets {
+            width: 100%;
             font-size: 0.9rem;
-            background-color: #ffffff;
-            border: 1px solid #dee2e6;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-            /* leichter Schatten */
-            transition: transform 0.2s ease-in-out;
         }
 
-        .card:hover {
-            transform: scale(1.01);
-            /* kleine Hover-Interaktion */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
-
-        .card-title {
-            font-size: 1.1rem;
-        }
-
-        .card-body p {
-            margin-bottom: 0.5rem;
-        }
-
-        .card-img-top {
-            height: 200px;
-            /* Einheitliche Höhe */
-            object-fit: cover;
-            /* Bild wird beschnitten, nicht verzerrt */
-        }
-
-        /* === Navbar Design === */
-        .navbar-custom {
-            background: linear-gradient(to right, #cce5f6, #e6f2fb);
-            border-bottom: 1px solid #b3d7f2;
-        }
-
-        .navbar-custom .navbar-brand,
-        .navbar-custom .nav-link {
-            color: #0c2c4a;
-            font-weight: 500;
-        }
-
-        .navbar-custom .nav-link:hover,
-        .navbar-custom .nav-link:focus {
-            color: #04588c;
-            text-decoration: underline;
-        }
-
-        .custom-header {
-            background: linear-gradient(to right, #2a55e0ff, #4670e4ff);
-            /* dunkles, klassisches Grün */
-            border-bottom: 2px solid #0666f7ff;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            border-radius: 0 0 1rem 1rem;
-        }
-
-        .btn-darkgreen {
-            background-color: #0d3dc2ff;
-            border-color: #145214;
-            color: #fff;
-        }
-
-        .btn-darkgreen:hover {
-            background-color: #0337e4ff;
-            ;
-            border-color: #2146beff;
-        }
-
-        .btn {
-            border-radius: 50rem;
-            /* pill-shape */
-            font-size: 0.9rem;
-            padding: 0.375rem 0.75rem;
-            font-size: 0.85rem;
+        #TableTickets tbody tr:hover {
+            background-color: #f1f5ff;
         }
     </style>
 </head>
@@ -160,7 +63,7 @@ if ($_SESSION['userid'] == "") {
                                 <span class="me-2">Angemeldet als: <?= htmlspecialchars($_SESSION['email']) ?></span>
                             </div>
                             <!-- Logout-Button -->
-                            <a class="btn btn-darkgreen btn-sm" title="Abmelden vom Webshop" href="logout.php">
+                            <a class="btn btn-darkblue btn-sm" title="Abmelden vom Webshop" href="logout.php">
                                 <i class="fa fa-sign-out" aria-hidden="true"></i> Ausloggen
                             </a>
                         </div>
@@ -182,6 +85,32 @@ if ($_SESSION['userid'] == "") {
 
             ?>
             <br>
+            <div class="d-flex mb-3 mx-2">
+                <!-- Filter nach Kunde -->
+                <div class="me-3">
+                    <select id="filterKunde" style="text-align: left;" class="form-select btn btn-secondary">
+                        <option value="">Kunden (Alle)</option>
+                    </select>
+                </div>
+                <!-- Filter nach Status -->
+                <div class="me-3">
+                    <select id="filterStatus" style="text-align: left;" class="form-select btn btn-primary">
+                        <option value="">Status (Alle)</option>
+                    </select>
+                </div>
+
+                <!-- Filter nach Priorität -->
+                <div class="me-3">
+                    <select id="filterPriority" style="text-align: left;" class="form-select btn btn-success">
+                        <option value="">Priorität (Alle)</option>
+                    </select>
+                </div>
+
+                <!-- Reset-Button -->
+                <div>
+                    <button id="resetFilters" class="btn btn-secondary">Filter zurücksetzen</button>
+                </div>
+            </div>
             <div class="custom-container mx-2">
                 <table id="TableTickets" class="display nowrap">
                     <thead>
@@ -199,18 +128,26 @@ if ($_SESSION['userid'] == "") {
                     </thead>
                     <tbody>
                         <?php
-                        $sql = "SELECT TicketID, ticket.Description, ticket.Notes, CreatedDate, DueDate, ClosedDate, ticket.PriorityID, priority.Description  as PriorityText, priority.SortOrder, ticket.StatusID, status.Description as StatusText, ticket.CustomerID, customer.Firma, customer.Zusatz FROM ticket inner join status on ticket.StatusID = status.StatusID inner join priority on ticket.PriorityID = priority.PriorityID inner join customer on ticket.CustomerID = customer.CustomerID where ticket.UserID = :userid ORDER BY CreatedDate DESC";
+                        $sql = "SELECT TicketID, ticket.Description, ticket.Notes, CreatedDate, DueDate, ClosedDate, ticket.PriorityID, priority.Description as PriorityText, priority.SortOrder, ticket.StatusID, status.Description as StatusText, ticket.CustomerID, customer.Firma, customer.Zusatz 
+        FROM ticket 
+        INNER JOIN status ON ticket.StatusID = status.StatusID 
+        INNER JOIN priority ON ticket.PriorityID = priority.PriorityID 
+        INNER JOIN customer ON ticket.CustomerID = customer.CustomerID 
+        WHERE ticket.UserID = :userid 
+        ORDER BY DueDate DESC";
                         $stmt = $pdo->prepare($sql);
                         $stmt->execute(['userid' => $userid]);
 
                         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                             $formattedDateCreate = (new DateTime($row['CreatedDate']))->format('d.m.Y');
                             $formattedDateDue = (new DateTime($row['DueDate']))->format('d.m.Y');
-                            $formattedDateClosed = (new DateTime($row['ClosedDate']))->format('d.m.Y');
 
-                            if ($formattedDateClosed == '30.11.-0001')
-                                $formattedDateClosed = "";
+                            $formattedDateClosed = "";
+                            if (!empty($row['ClosedDate']) && $row['ClosedDate'] !== "0000-00-00") {
+                                $formattedDateClosed = (new DateTime($row['ClosedDate']))->format('d.m.Y');
+                            }
 
+                            // CSS-Klasse bestimmen
                             $class = '';
                             if ($row['PriorityID'] == 8) {
                                 $class = 'urgent-priority';
@@ -218,27 +155,32 @@ if ($_SESSION['userid'] == "") {
                                 $class = 'high-priority';
                             }
 
+                            // Überfällige Tickets prüfen
+                            $dueDateObj = new DateTime($row['DueDate']);
+                            $today = new DateTime();
+                            if ($dueDateObj < $today && ($row['StatusID'] == 3 || $row['StatusID'] == 1)) {
+                                $class .= ' overdue';
+                            }
 
                             echo "<tr class='$class'>
-                                    <td>{$row['TicketID']}</td>
-                                    <td>{$row['Description']}</td>
-                                    <td>{$row['Notes']}</td>
-                                    <td>{$formattedDateCreate}</td>
-                                    <td>{$formattedDateDue}</td>
-                                    <td>{$row['Firma']} {$row['Zusatz']}</td>
-                                    <td>{$row['PriorityText']}</td>
-                                    <td>{$row['StatusText']}</td>                                                                                                             
-                                    
-                                    <td style='vertical-align: top; width:7%; white-space: nowrap;'>                                        
-                                        <a href='ShowTickets.php?TicketID={$row['TicketID']}' style='width:60px;' title='Ticketübersicht' class='btn btn-primary btn-sm'><i class='fa-solid fa-pen-to-square'></i></a>
-                                        <a href='EditTicket.php?TicketID={$row['TicketID']}' style='width:60px;' title='Ticket bearbeiten' class='btn btn-primary btn-sm'><i class='fa-solid fa-ticket'></i></a>
-                                        <a href='DeleteTicket.php?TicketID={$row['TicketID']}' data-id={$row['TicketID']} style='width:60px;' title='Ticket löschen' class='btn btn-danger btn-sm delete-button'><i class='fa-solid fa-trash'></i></a>
-                                    </td>
-                                    
-                                </tr>";
+                                <td>{$row['TicketID']}</td>
+                                <td style='white-space:normal;'>{$row['Description']}</td>
+                                <td style='white-space:normal;'>{$row['Notes']}</td>
+                                <td data-order='{$row['CreatedDate']}'>{$formattedDateCreate}</td>
+                                <td data-order='{$row['DueDate']}'>{$formattedDateDue}</td>
+                                <td style='white-space:normal;'>{$row['Firma']} {$row['Zusatz']}</td>
+                                <td>{$row['PriorityText']}</td>
+                                <td>{$row['StatusText']}</td>
+                                <td style='vertical-align: top; width:7%; white-space: nowrap;'>
+                                    <a href='ShowTickets.php?TicketID={$row['TicketID']}' style='width:60px;' title='Ticketübersicht' class='btn btn-primary btn-sm'><i class='fa-solid fa-pen-to-square'></i></a>
+                                    <a href='EditTicket.php?TicketID={$row['TicketID']}' style='width:60px;' title='Ticket bearbeiten' class='btn btn-primary btn-sm'><i class='fa-solid fa-ticket'></i></a>
+                                    <a href='DeleteTicket.php?TicketID={$row['TicketID']}' data-id={$row['TicketID']} style='width:60px;' title='Ticket löschen' class='btn btn-danger btn-sm delete-button'><i class='fa-solid fa-trash'></i></a>
+                                </td>
+                            </tr>";
                         }
                         ?>
                     </tbody>
+
                 </table>
             </div>
             <!-- Bootstrap Modal -->
@@ -278,8 +220,9 @@ if ($_SESSION['userid'] == "") {
         <!-- JS -->
         <script src="js/jquery.min.js"></script>
         <script src="js/bootstrap.bundle.min.js"></script>
-        <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-        <script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
+        <script src="js/jquery.dataTables.min.js"></script>
+        <script src="js/dataTables.min.js"></script>
+        <script src="js/dataTables.responsive.min.js"></script>
 
         <script>
             $(document).ready(function () {
@@ -324,27 +267,72 @@ if ($_SESSION['userid'] == "") {
                 }
             }
 
+
             $(document).ready(function () {
-                $('#TableTickets').DataTable({
+                var table = $('#TableTickets').DataTable({
                     language: {
                         url: "https://cdn.datatables.net/plug-ins/1.13.4/i18n/de-DE.json"
                     },
-                    search: {
-                        return: true
+                    responsive: {
+                        details: {
+                            display: $.fn.dataTable.Responsive.display.modal({
+                                header: function (row) {
+                                    var data = row.data();
+                                    return 'Details zu ' + data[1];
+                                }
+                            }),
+                            renderer: $.fn.dataTable.Responsive.renderer.tableAll({
+                                tableClass: 'table'
+                            })
+                        }
                     },
-                    responsive: true,
                     pageLength: 10,
                     autoWidth: false,
-                    columnDefs: [
-                        { type: 'date', targets: 3 } // "Datum" ist die vierte Spalte
-                    ],
-                    order: [[2, 'desc']], // Sortiere nach der zweiten Spalte (CreatedDate)
-                    language: {
-                        url: "https://cdn.datatables.net/plug-ins/1.13.4/i18n/de-DE.json"
-                    }
+                    order: [[4, 'desc']] // sortiere nach DueDate
+                });
+
+                // Dropdowns füllen
+                function fillDropdown(columnIndex, dropdownId) {
+                    var uniqueValues = [];
+                    table.column(columnIndex).data().each(function (value) {
+                        if (value && $.inArray(value, uniqueValues) === -1) {
+                            uniqueValues.push(value);
+                        }
+                    });
+                    uniqueValues.sort();
+                    $.each(uniqueValues, function (i, val) {
+                        $(dropdownId).append('<option value="' + val + '">' + val + '</option>');
+                    });
+                }
+
+                fillDropdown(5, '#filterKunde');     // Kunde
+                fillDropdown(6, '#filterPriority');  // Priorität
+                fillDropdown(7, '#filterStatus');    // Status
+
+                // Filter-Events
+                $('#filterStatus').on('change', function () {
+                    var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                    table.column(7).search(val ? '^' + val + '$' : '', true, false).draw();
+                });
+
+                $('#filterPriority').on('change', function () {
+                    var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                    table.column(6).search(val ? '^' + val + '$' : '', true, false).draw();
+                });
+
+                $('#filterKunde').on('change', function () {
+                    var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                    table.column(5).search(val ? '^' + val + '$' : '', true, false).draw();
+                });
+
+                // Reset-Button
+                $('#resetFilters').on('click', function () {
+                    $('#filterKunde, #filterPriority, #filterStatus').val('');
+                    table.columns().search('').draw();
                 });
             });
         </script>
+
 
 </body>
 
